@@ -215,6 +215,7 @@ import { Roles } from 'src/shared/guards/roles.decorator';
 import { UsersService } from './users.service';
 @ApiTags('Users') // Etiqueta para agrupar endpoints relacionados
 @ApiBearerAuth() // Indica que este endpoint requiere autenticación JWT
+@ApiSecurity('x-csrf-token') //Indica que este endpoint requere uso de x-csrf-token
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard) // Protege el endpoint con guards
 export class UsersController {
@@ -250,7 +251,7 @@ export class UsersController {
 2. Abre tu navegador y navega a:
 
    ```
-   http://localhost:3000/api
+   http://localhost:3000/api/v1/zenta/swagger-doc
    ```
 
 3. La interfaz de Swagger mostrará todos los endpoints documentados, junto con ejemplos de solicitudes y respuestas.
