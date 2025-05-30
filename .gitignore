@@ -36,5 +36,4 @@ lerna-debug.log*
 
 credential.json
 env.yaml
-cloudbuild.yaml
 .env

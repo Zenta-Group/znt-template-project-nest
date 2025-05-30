@@ -64,6 +64,19 @@ EXTERNAL_API_KEY=tu-api-key # Si aplica
 EXTERNAL_API_TOKEN=tu-token-jwt # Si aplica
 ```
 
+
+#### 3.1 Example
+
+```env
+APP_PORT=3000
+LIST_CORS=http://localhost:4200,http://localhost:3000
+TOKEN_EXPIRATION=3600
+SECRETKEY_AUTH = asdsad
+EXTERNAL_API__SECURITY_TYPE=none # none | api-key | bearer-token
+EXTERNAL_API_TOKEN=sd
+```
+
+
 ### 4. Ejecutar el Proyecto
 
 Para iniciar el proyecto en modo desarrollo:
