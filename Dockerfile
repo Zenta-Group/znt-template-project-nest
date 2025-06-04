@@ -1,4 +1,9 @@
-FROM node:20.11.1-alpine
+FROM node:24.1.0-slim
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+
 
 WORKDIR /usr/src/app
 

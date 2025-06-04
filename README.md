@@ -40,11 +40,22 @@ git clone https://github.com/Zenta-Group/znt-template-project-nest.git
 cd znt-template-project-nest
 ```
 
+
+
 ### 2. Instalar Dependencias
 
 ```bash
 npm install
 ```
+
+
+### 3. Configurar el nombre del artefacto
+
+packaage.json > name
+
+ej : client-namesystem-back
+
+
 
 ### 3. Configurar Variables de Entorno
 

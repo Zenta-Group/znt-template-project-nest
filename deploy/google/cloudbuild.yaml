@@ -1,0 +1,40 @@
+steps:
+  - id: 'Build docker image'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/client-system-backend:$BUILD_ID',
+        '.',
+      ]
+
+  - id: 'Push docker image'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'push',
+        '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/client-system-backend:$BUILD_ID',
+      ]
+  - id: 'Deploy to Cloud Run'
+    name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'client-system-backend-${_ENV}'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/client-system-backend:$BUILD_ID'
+      - '--region'
+      - '${_REGION}'
+      - '--service-account'
+      - '${_RUN_SERVICE_ACCOUNT_EMAIL}'
+      - '--set-env-vars=ENV=${_ENV}'
+      - '--set-env-vars=PROJECT_ID=$PROJECT_ID'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
