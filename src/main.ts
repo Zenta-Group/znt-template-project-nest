@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { CustomLogger } from './core/logger/custom-logger';
 
 async function bootstrap() {
+  const prefix = 'api/v1/zenta';
   const logger = new Logger('NestApplication');
   const app = await NestFactory.create(AppModule, {
     logger: new CustomLogger(),
@@ -22,7 +23,7 @@ async function bootstrap() {
     origin: [configService.get('listCors')],
     credentials: true,
   });
-  app.setGlobalPrefix('api/v1/zenta');
+  app.setGlobalPrefix(prefix);
 
   const config = new DocumentBuilder()
     .setTitle('Template Nest Zenta')
@@ -35,9 +36,9 @@ async function bootstrap() {
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1/zenta/swagger-doc', app, document);
+  SwaggerModule.setup(`${prefix}/swagger-doc`, app, document);
   logger.log(
-    `Swagger running on http://localhost:${port}/api/v1/zenta/swagger-doc`,
+    `Swagger running on http://localhost:${port}/${prefix}/swagger-doc`,
   );
 
   await app.listen(port, () => {
