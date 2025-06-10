@@ -1,9 +1,6 @@
 FROM node:24.1.0-slim
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-
+RUN groupadd -r appgroup && useradd -m -r -g appgroup appuser
 
 WORKDIR /usr/src/app
 
@@ -14,5 +11,8 @@ RUN npm install
 COPY . .
 
 RUN npm run build
+
+USER appuser
+
 
 CMD [ "node", "dist/main.js" ]
