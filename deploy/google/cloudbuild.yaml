@@ -16,6 +16,35 @@ steps:
         'push',
         '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/client-system-backend:$BUILD_ID',
       ]
+  
+  - id: 'Sonar'
+    name: 'sonarsource/sonar-scanner-cli:5.0'
+    entrypoint: 'sonar-scanner'
+    args:
+      - '-Dsonar.host.url=https://sonar.zentalabs.com'
+      - '-Dsonar.login=${_SONAR_TOKEN}'
+      - '-Dsonar.projectKey=${_SONAR_PROJECT_KEY}'
+      - '-Dsonar.sources=src'
+      - '-Dsonar.tests=src'
+      - '-Dsonar.test.inclusions=**/*.spec.ts'
+      - '-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info'
+      - '-Dsonar.typescript.lcov.reportPaths=coverage/lcov.info'
+      - >-
+        -Dsonar.exclusions=**/*.entity.ts,**/*.dto.ts,**/*.module.ts,**/*.interface.ts,**/main.ts,
+        **/core/database/entities/**,**/shared/models/**,**/shared/interfaces/**,
+        **/shared/enums/**,**/shared/constants/**,**/shared/decorators/**,
+        **/shared/exceptions/**,**/shared/dtos/**,**/shared/pipes/**,
+        **/shared/guards/**,**/shared/interceptors/**,**/shared/utils/**,
+        **/auth/google-auth.service.ts,**/auth/auth.module.ts
+      - >-
+        -Dsonar.coverage.exclusions=**/*.dto.ts,**/*.module.ts,**/*.interface.ts,
+        **/main.ts,**/core/database/entities/**,**/shared/models/**,
+        **/shared/interfaces/**,**/shared/enums/**,**/shared/constants/**,
+        **/shared/decorators/**,**/shared/exceptions/**,**/shared/dtos/**,
+        **/shared/pipes/**,**/shared/guards/**,**/shared/interceptors/**,
+        **/shared/utils/**,**/auth/google-auth.service.ts,**/auth/auth.module.ts
+
+
   - id: 'Deploy to Cloud Run'
     name: 'gcr.io/cloud-builders/gcloud'
     args:
