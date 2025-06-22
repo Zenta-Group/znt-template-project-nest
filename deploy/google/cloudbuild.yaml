@@ -5,7 +5,7 @@ steps:
       [
         'build',
         '-t',
-        '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/client-system-backend:$BUILD_ID',
+        '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/${_COMPONENT_NAME}:$BUILD_ID',
         '.',
       ]
 
@@ -14,7 +14,7 @@ steps:
     args:
       [
         'push',
-        '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/client-system-backend:$BUILD_ID',
+        '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/${_COMPONENT_NAME}:$BUILD_ID',
       ]
   
   - id: 'Sonar'
@@ -23,7 +23,7 @@ steps:
     args:
       - '-Dsonar.host.url=https://sonar.zentalabs.com'
       - '-Dsonar.login=${_SONAR_TOKEN}'
-      - '-Dsonar.projectKey=${_SONAR_PROJECT_KEY}'
+      - '-Dsonar.projectKey=${_COMPONENT_NAME}'
       - '-Dsonar.sources=src'
       - '-Dsonar.tests=src'
       - '-Dsonar.test.inclusions=**/*.spec.ts'
@@ -50,9 +50,9 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'client-system-backend-${_ENV}'
+      - '${_COMPONENT_NAME}-${_ENV}'
       - '--image'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/client-system-backend:$BUILD_ID'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/${_COMPONENT_NAME}:$BUILD_ID'
       - '--region'
       - '${_REGION}'
       - '--service-account'
