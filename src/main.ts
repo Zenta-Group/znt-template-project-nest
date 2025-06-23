@@ -19,10 +19,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get('port');
 
-  app.enableCors({
-    origin: [configService.get('listCors')],
-    credentials: true,
-  });
+  await enableCors(app, configService);
+  
   app.setGlobalPrefix(prefix);
 
   const config = new DocumentBuilder()
@@ -44,5 +42,23 @@ async function bootstrap() {
   await app.listen(port, () => {
     logger.log(`App corriendo en http://localhost:${port}`);
   });
+}
+
+async function enableCors(app, configService) {
+  if (!configService.get('listCors')) {
+    return;
+  }
+  if(configService.get('listCors') === '*') {
+    app.enableCors();
+    return;
+  }
+  else if (configService.get('listCors').includes(',')) {   
+    const corsOptions = {
+      origin: [configService.get('listCors')],
+      credentials: true,
+    };
+    app.enableCors(corsOptions);
+    return;
+  }
 }
 bootstrap();
