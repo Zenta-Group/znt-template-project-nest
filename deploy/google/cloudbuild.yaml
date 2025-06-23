@@ -21,7 +21,7 @@ steps:
     name: 'sonarsource/sonar-scanner-cli:5.0'
     entrypoint: 'sonar-scanner'
     args:
-      - '-Dsonar.host.url=https://sonar.zentalabs.com'
+      - '-Dsonar.host.url=${_SONAR_URL}'
       - '-Dsonar.login=${_SONAR_TOKEN}'
       - '-Dsonar.projectKey=${_COMPONENT_NAME}'
       - '-Dsonar.sources=src'
@@ -64,6 +64,7 @@ steps:
       - '--set-env-vars=SECRETKEY_AUTH=${_SECRETKEY_AUTH}'
       - '--set-env-vars=EXTERNAL_API__SECURITY_TYPE=${_EXTERNAL_API_SECURITY_TYPE}'
       - '--set-env-vars=EXTERNAL_API_TOKEN=${_EXTERNAL_API_TOKEN}'
+      - '--set-env-vars=GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID}'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
