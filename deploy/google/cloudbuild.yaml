@@ -65,6 +65,7 @@ steps:
       - '--set-env-vars=EXTERNAL_API__SECURITY_TYPE=${_EXTERNAL_API_SECURITY_TYPE}'
       - '--set-env-vars=EXTERNAL_API_TOKEN=${_EXTERNAL_API_TOKEN}'
       - '--set-env-vars=GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID}'
+      - '--set-env-vars=GCP_FIRESTORE_DATABASE_ID=${_GCP_FIRESTORE_DATABASE_ID}'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
