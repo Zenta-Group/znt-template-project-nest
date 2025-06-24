@@ -16,7 +16,7 @@ export class AuthController {
 
   @Post('google')
   @ApiOperation({
-    summary: 'Inicia sesión utilizando un id_token de Google OAuth',
+    summary: 'Inicia sesión utilizando un idToken de Google OAuth',
   })
   @ApiResponse({
     status: 200,
@@ -25,7 +25,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Error de validación en el id_token',
+    description: 'Error de validación en el idToken',
   })
   @ApiResponse({
     status: 401,
@@ -33,6 +33,6 @@ export class AuthController {
   })
   @UsePipes(new SecurityValidationPipe())
   async loginWithGoogle(@Body() dto: LoginRq): Promise<LoginRs> {
-    return this.googleAuthService.signIn(dto.id_token);
+    return this.googleAuthService.signIn(dto.idToken);
   }
 }
