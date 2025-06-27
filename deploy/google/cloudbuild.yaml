@@ -24,26 +24,6 @@ steps:
       - '-Dsonar.host.url=${_SONAR_URL}'
       - '-Dsonar.login=${_SONAR_TOKEN}'
       - '-Dsonar.projectKey=${_COMPONENT_NAME}'
-      - '-Dsonar.sources=src'
-      - '-Dsonar.tests=src'
-      - '-Dsonar.test.inclusions=**/*.spec.ts'
-      - '-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info'
-      - '-Dsonar.typescript.lcov.reportPaths=coverage/lcov.info'
-      - >-
-        -Dsonar.exclusions=**/*.entity.ts,**/*.dto.ts,**/*.module.ts,**/*.interface.ts,**/main.ts,
-        **/core/database/entities/**,**/shared/models/**,**/shared/interfaces/**,
-        **/shared/enums/**,**/shared/constants/**,**/shared/decorators/**,
-        **/shared/exceptions/**,**/shared/dtos/**,**/shared/pipes/**,
-        **/shared/guards/**,**/shared/interceptors/**,**/shared/utils/**,
-        **/auth/google-auth.service.ts,**/auth/auth.module.ts
-      - >-
-        -Dsonar.coverage.exclusions=**/*.dto.ts,**/*.module.ts,**/*.interface.ts,
-        **/main.ts,**/core/database/entities/**,**/shared/models/**,
-        **/shared/interfaces/**,**/shared/enums/**,**/shared/constants/**,
-        **/shared/decorators/**,**/shared/exceptions/**,**/shared/dtos/**,
-        **/shared/pipes/**,**/shared/guards/**,**/shared/interceptors/**,
-        **/shared/utils/**,**/auth/google-auth.service.ts,**/auth/auth.module.ts
-
 
   - id: 'Deploy to Cloud Run'
     name: 'gcr.io/cloud-builders/gcloud'
