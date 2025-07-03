@@ -13,7 +13,6 @@ import {
   UserNotFoundException,
   GenericAuthException,
 } from 'src/shared/exceptions/auth-exceptions';
-import { CsrfToken } from 'src/shared/entities/csrf-token.entity';
 import { CsrfService } from 'src/shared/services/csrf.service';
 
 @Injectable()
