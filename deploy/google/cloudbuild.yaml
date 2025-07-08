@@ -1,4 +1,8 @@
 steps:
+  - id : 'Unshallow clone'
+    name: gcr.io/cloud-builders/git
+    args: ['fetch', '--unshallow']
+
   - id: 'Build docker image'
     name: 'gcr.io/cloud-builders/docker'
     args:
