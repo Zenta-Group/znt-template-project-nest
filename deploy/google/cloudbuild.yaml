@@ -3,6 +3,14 @@ steps:
     name: gcr.io/cloud-builders/git
     args: ['fetch', '--unshallow']
 
+  - id: 'Sonar'
+    name: 'sonarsource/sonar-scanner-cli:5.0'
+    entrypoint: 'sonar-scanner'
+    args:
+      - '-Dsonar.host.url=${_SONAR_URL}'
+      - '-Dsonar.login=${_SONAR_TOKEN}'
+      - '-Dsonar.projectKey=${_COMPONENT_NAME}'
+
   - id: 'Build docker image'
     name: 'gcr.io/cloud-builders/docker'
     args:
@@ -20,14 +28,6 @@ steps:
         'push',
         '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/${_COMPONENT_NAME}:$BUILD_ID',
       ]
-  
-  - id: 'Sonar'
-    name: 'sonarsource/sonar-scanner-cli:5.0'
-    entrypoint: 'sonar-scanner'
-    args:
-      - '-Dsonar.host.url=${_SONAR_URL}'
-      - '-Dsonar.login=${_SONAR_TOKEN}'
-      - '-Dsonar.projectKey=${_COMPONENT_NAME}'
 
   - id: 'Deploy to Cloud Run'
     name: 'gcr.io/cloud-builders/gcloud'
