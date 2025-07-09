@@ -1,6 +1,9 @@
 node_modules
+npm-debug.log
+Dockerfile
 dist
 .git
+.gitignore
 .env
 coverage
 test
