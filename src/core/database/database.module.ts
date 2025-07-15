@@ -11,7 +11,7 @@ import { CsrfToken } from 'src/shared/entities/csrf-token.entity';
       provide: 'USER_REPOSITORY',
       useFactory: (configService: ConfigService) => {
         return new FirestoreRepository<User>(configService, {
-          collectionName: 'usuarios',
+          collectionName: 'users',
         });
       },
       inject: [ConfigService],
@@ -25,7 +25,16 @@ import { CsrfToken } from 'src/shared/entities/csrf-token.entity';
       },
       inject: [ConfigService],
     },
+    {
+      provide: 'GENERIC_REPOSITORY',
+      useFactory: (configService: ConfigService) => {
+        return new FirestoreRepository<User>(configService, {
+          collectionName: 'generics',
+        });
+      },
+      inject: [ConfigService],
+    },
   ],
-  exports: ['USER_REPOSITORY', 'CSRF_TOKEN_REPOSITORY'],
+  exports: ['USER_REPOSITORY', 'GENERIC_REPOSITORY', 'CSRF_TOKEN_REPOSITORY'],
 })
 export class DatabaseModule {}

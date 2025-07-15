@@ -17,7 +17,16 @@ export class CsrfInterceptor implements NestInterceptor {
     next: CallHandler,
   ): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
-    const userId = request.user?.id;
+    let userId: string | undefined;
+    
+    // Primero intentar obtener el usuario del request (si el guard JWT ya se ejecutó)
+    if (request.user?.id) {
+      userId = request.user.id;
+    }
+    
+    if (!userId) {
+      throw new BadRequestException('Usuario no autenticado.');
+    }
     const csrfToken = request.headers['x-csrf-token'];
 
     if (!csrfToken) {
