@@ -1,9 +1,27 @@
 node_modules
-npm-debug.log
-Dockerfile
 dist
+npm-debug.log
+# Global files
+Dockerfile
+.dockerignore
 .git
 .gitignore
 .env
+.env.*
+*.md
+.idea
+.vscode
 coverage
 test
+tests
+*.pem
+*.key
+*.crt
+*.pub
+# GCP/AWS credentials
+*.json
+!package.json
+!package-lock.json
+.aws
+.gcp
+.credentials
