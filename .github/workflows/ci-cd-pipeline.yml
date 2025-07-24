@@ -1,0 +1,13 @@
+name: Simple CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  hello-world:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Saludar
+        run: echo "Hola Mundo"
