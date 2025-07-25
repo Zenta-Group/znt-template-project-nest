@@ -4,10 +4,22 @@ on:
   push:
     branches:
       - main
+      - feature/*
+  workflow_call:
+    inputs:
+      os_version:
+        description: "Pipeline operating system"
+        default: "ubuntu-latest"
+        required: false
+        type: string
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
 
 jobs:
   hello-world:
-    runs-on: ubuntu-latest
+    #runs-on: ubuntu-latest
+    runs-on: ${{ inputs.os_version }}
     steps:
       - name: Saludar
         run: echo "Hola Mundo"
