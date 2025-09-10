@@ -22,6 +22,8 @@ tests
 *.json
 !package.json
 !package-lock.json
+!nest-cli.json
+!tsconfig*.json
 .aws
 .gcp
 .credentials
