@@ -1,14 +1,18 @@
 // src/shared/services/csrf.service.ts
 import { Inject, Injectable } from '@nestjs/common';
-import { CsrfToken } from '../entities/csrf-token.entity';
+import { CsrfToken } from '../models/csrf-token.model';
 import * as crypto from 'crypto';
-import { IDatabaseService } from '../interfaces/i-database-service.interface';
+import { IBaseRepository } from '../interfaces/repository.ports';
 
 @Injectable()
 export class CsrfService {
   constructor(
     @Inject('CSRF_TOKEN_REPOSITORY')
-    private readonly csrfTokenRepository: IDatabaseService<CsrfToken>,
+    private readonly csrfTokenRepository: IBaseRepository<
+      CsrfToken,
+      any,
+      string
+    >,
   ) {}
 
   async generateCsrfToken(userId: string): Promise<string> {
@@ -18,12 +22,12 @@ export class CsrfService {
       token,
       createdAt: new Date(),
     };
-    await this.csrfTokenRepository.createOrReplace(userId, csrfToken);
+    await this.csrfTokenRepository.upsert(userId, csrfToken);
     return token;
   }
 
   async validateCsrfToken(userId: string, token: string): Promise<boolean> {
-    const storedToken = await this.csrfTokenRepository.getByField('id', userId);
+    const storedToken = await this.csrfTokenRepository.findById(userId);
     return !!storedToken && storedToken.token === token;
   }
 }

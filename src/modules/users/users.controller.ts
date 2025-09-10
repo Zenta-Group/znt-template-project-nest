@@ -23,13 +23,13 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-users.dto';
 import { UpdateUserDto } from './dtos/update-users.dto';
-import { User } from 'src/shared/entities/user.entity';
 
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/guards/roles.decorator';
 import { SecurityValidationPipe } from 'src/shared/pipes/validations/security-validation.pipe';
 import { CsrfInterceptor } from 'src/shared/interceptors/csrf.interceptor';
+import { UserDto } from 'src/shared/dtos/user.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -47,7 +47,7 @@ export class UsersController {
   @ApiResponse({
     status: 201,
     description: 'Usuario creado exitosamente',
-    type: User,
+    type: UserDto,
   })
   @ApiResponse({ status: 400, description: 'Error de validación en DTO' })
   @ApiResponse({
@@ -55,8 +55,9 @@ export class UsersController {
     description: 'Acceso denegado (role no permitido)',
   })
   @UsePipes(new SecurityValidationPipe())
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.createUser(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
+    const user = await this.usersService.createUser(createUserDto);
+    return UserDto.fromDomain(user);
   }
 
   @Get()
@@ -65,11 +66,13 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Retorna un array de usuarios',
-    type: [User],
+    type: [UserDto],
   })
   @UsePipes(new SecurityValidationPipe())
-  async findAll(): Promise<User[]> {
-    return this.usersService.getAllUsers();
+  async findAll(): Promise<UserDto[]> {
+    const page = await this.usersService.getAllUsers();
+    const data = page.data.map(UserDto.fromDomain);
+    return data;
   }
 
   @Get(':id')
@@ -79,12 +82,13 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Retorna el usuario solicitado',
-    type: User,
+    type: UserDto,
   })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   @UsePipes(new SecurityValidationPipe())
-  async findOne(@Param('id') id: string): Promise<User | null> {
-    return this.usersService.getUserById(id);
+  async findOne(@Param('id') id: string): Promise<UserDto | null> {
+    const user = await this.usersService.getUserById(id);
+    return UserDto.fromDomain(user);
   }
 
   @Put(':id')
@@ -94,15 +98,16 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Usuario actualizado exitosamente',
-    type: User,
+    type: UserDto,
   })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   @UsePipes(new SecurityValidationPipe())
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User> {
-    return this.usersService.updateUser(id, updateUserDto);
+  ): Promise<UserDto> {
+    const user = await this.usersService.updateUser(id, updateUserDto);
+    return UserDto.fromDomain(user);
   }
 
   @Delete(':id')

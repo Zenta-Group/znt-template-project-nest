@@ -1,4 +1,4 @@
-export class CsrfToken {
+export interface CsrfToken {
   id: string;
   token: string;
   createdAt: Date;

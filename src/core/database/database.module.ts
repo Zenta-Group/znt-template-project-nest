@@ -1,40 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { FirestoreRepository } from './firestore.repository';
-import { User } from 'src/shared/entities/user.entity';
-import { CsrfToken } from 'src/shared/entities/csrf-token.entity';
+import { FirestoreModule } from './adapters/firestore/firestore.module';
+import { TypeOrmModule } from './adapters/typeorm/typeorm.module';
 
 @Module({
-  imports: [ConfigModule],
-  providers: [
-    {
-      provide: 'USER_REPOSITORY',
-      useFactory: (configService: ConfigService) => {
-        return new FirestoreRepository<User>(configService, {
-          collectionName: 'users',
-        });
-      },
-      inject: [ConfigService],
-    },
-    {
-      provide: 'CSRF_TOKEN_REPOSITORY',
-      useFactory: (configService: ConfigService) => {
-        return new FirestoreRepository<CsrfToken>(configService, {
-          collectionName: 'csrfTokens',
-        });
-      },
-      inject: [ConfigService],
-    },
-    {
-      provide: 'GENERIC_REPOSITORY',
-      useFactory: (configService: ConfigService) => {
-        return new FirestoreRepository<User>(configService, {
-          collectionName: 'generics',
-        });
-      },
-      inject: [ConfigService],
-    },
-  ],
-  exports: ['USER_REPOSITORY', 'GENERIC_REPOSITORY', 'CSRF_TOKEN_REPOSITORY'],
+  imports: [FirestoreModule, TypeOrmModule],
+  providers: [],
+  exports: [FirestoreModule, TypeOrmModule],
 })
 export class DatabaseModule {}

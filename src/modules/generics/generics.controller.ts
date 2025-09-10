@@ -20,7 +20,6 @@ import {
   ApiSecurity,
 } from '@nestjs/swagger';
 
-
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/guards/roles.decorator';
@@ -28,8 +27,9 @@ import { SecurityValidationPipe } from 'src/shared/pipes/validations/security-va
 import { CsrfInterceptor } from 'src/shared/interceptors/csrf.interceptor';
 import { GenericsService } from './generics.service';
 import { CreateGenericDto } from './dtos/create-generic.dto';
-import { Generic } from 'src/shared/entities/generic.entity';
+import { Generic } from 'src/shared/models/generic.model';
 import { UpdateGenericDto } from './dtos/update-generic.dto';
+import { GenericDto } from 'src/shared/dtos/generic.dto';
 
 @ApiTags('Generics')
 @ApiBearerAuth()
@@ -47,7 +47,7 @@ export class GenericsController {
   @ApiResponse({
     status: 201,
     description: 'Registro creado exitosamente',
-    type: Generic,
+    type: GenericDto,
   })
   @ApiResponse({ status: 400, description: 'Error de validación en DTO' })
   @ApiResponse({
@@ -55,8 +55,11 @@ export class GenericsController {
     description: 'Acceso denegado (role no permitido)',
   })
   @UsePipes(new SecurityValidationPipe())
-  async create(@Body() createGenericDto: CreateGenericDto): Promise<Generic> {
-    return this.service.create(createGenericDto);
+  async create(
+    @Body() createGenericDto: CreateGenericDto,
+  ): Promise<GenericDto> {
+    const generic = await this.service.create(createGenericDto);
+    return GenericDto.fromDomain(generic);
   }
 
   @Get()
@@ -65,11 +68,13 @@ export class GenericsController {
   @ApiResponse({
     status: 200,
     description: 'Retorna un array de registros',
-    type: [Generic],
+    type: [GenericDto],
   })
   @UsePipes(new SecurityValidationPipe())
-  async findAll(): Promise<Generic[]> {
-    return this.service.getAll();
+  async findAll(): Promise<GenericDto[]> {
+    const page = await this.service.getAll();
+    const data = page.data.map(GenericDto.fromDomain);
+    return data;
   }
 
   @Get(':id')
@@ -79,12 +84,13 @@ export class GenericsController {
   @ApiResponse({
     status: 200,
     description: 'Retorna el registro solicitado',
-    type: Generic,
+    type: GenericDto,
   })
   @ApiResponse({ status: 404, description: 'Registro no encontrado' })
   @UsePipes(new SecurityValidationPipe())
-  async findOne(@Param('id') id: string): Promise<Generic | null> {
-    return this.service.getById(id);
+  async findOne(@Param('id') id: string): Promise<GenericDto | null> {
+    const generic = await this.service.getById(id);
+    return GenericDto.fromDomain(generic);
   }
 
   @Put(':id')
@@ -94,15 +100,16 @@ export class GenericsController {
   @ApiResponse({
     status: 200,
     description: 'Registro actualizado exitosamente',
-    type: Generic,
+    type: GenericDto,
   })
   @ApiResponse({ status: 404, description: 'Registro no encontrado' })
   @UsePipes(new SecurityValidationPipe())
   async update(
     @Param('id') id: string,
     @Body() updateGenericDto: UpdateGenericDto,
-  ): Promise<Generic> {
-    return this.service.update(id, updateGenericDto);
+  ): Promise<GenericDto> {
+    const generic = await this.service.update(id, updateGenericDto);
+    return GenericDto.fromDomain(generic);
   }
 
   @Delete(':id')

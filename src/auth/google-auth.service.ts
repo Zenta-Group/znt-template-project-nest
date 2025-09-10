@@ -6,14 +6,14 @@ import { OAuth2Client } from 'google-auth-library';
 
 import { IAuthService } from 'src/shared/interfaces/i-auth-service.interface';
 import { LoginRs, UserData } from 'src/shared/dtos/login-rs';
-import { IDatabaseService } from 'src/shared/interfaces/i-database-service.interface';
-import { User } from 'src/shared/entities/user.entity';
+import { User } from 'src/shared/models/user.model';
 import {
   InvalidTokenException,
   UserNotFoundException,
   GenericAuthException,
 } from 'src/shared/exceptions/auth-exceptions';
 import { CsrfService } from 'src/shared/services/csrf.service';
+import { IBaseRepository } from 'src/shared/interfaces/repository.ports';
 
 @Injectable()
 export class GoogleAuthService implements IAuthService<string> {
@@ -25,7 +25,7 @@ export class GoogleAuthService implements IAuthService<string> {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     @Inject('USER_REPOSITORY')
-    private readonly userRepository: IDatabaseService<User>,
+    private readonly userRepository: IBaseRepository<User, any, string>,
     private readonly csrfService: CsrfService,
   ) {
     this.jwtSecret = this.configService.get<string>('secretKeyAuth') || '';
@@ -53,7 +53,9 @@ export class GoogleAuthService implements IAuthService<string> {
       }
 
       const email = payload.email;
-      const user = await this.userRepository.getByField('email', email);
+      const user = await this.userRepository.findOne({
+        filter: { email: email },
+      });
       if (!user) {
         throw new UserNotFoundException(email);
       }
@@ -82,6 +84,7 @@ export class GoogleAuthService implements IAuthService<string> {
 
       return rs;
     } catch (error) {
+      console.log(error);
       this.logger.error('Error signIn GoogleAuthService', error?.message);
       rs.code = 1;
       rs.data = null;

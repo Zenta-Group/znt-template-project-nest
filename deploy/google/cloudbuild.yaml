@@ -1,5 +1,5 @@
 steps:
-  - id : 'Unshallow clone'
+  - id: 'Unshallow clone'
     name: gcr.io/cloud-builders/git
     args: ['fetch', '--unshallow']
 
@@ -51,6 +51,13 @@ steps:
       - '--set-env-vars=EXTERNAL_API_BASE_URL=${_EXTERNAL_API_BASE_URL}'
       - '--set-env-vars=GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID}'
       - '--set-env-vars=GCP_FIRESTORE_DATABASE_ID=${_GCP_FIRESTORE_DATABASE_ID}'
+      - '--set-env-vars=NODE_ENV=${_ENV}'
+      - '--set-env-vars=LOG_LEVEL=${_LOG_LEVEL}'
+      - '--set-env-vars=DB_HOST=${_DB_HOST}'
+      - '--set-env-vars=DB_PORT=${_DB_PORT}'
+      - '--set-env-vars=DB_USER=${_DB_USER}'
+      - '--set-env-vars=DB_PASS=${_DB_PASS}'
+      - '--set-env-vars=DB_DB=${_DB_DB}'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'

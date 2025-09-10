@@ -10,48 +10,75 @@ import {
   IntegrationException,
 } from '../../shared/exceptions/integration-exceptions';
 import { ISecurityConfig, SecurityType } from '../config/axios.configuration';
+import { GoogleAuth } from 'google-auth-library';
 
 @Injectable()
 export class AxiosService<T> implements IIntegrationService<T> {
   private logger = new Logger('AxiosService');
   private axiosInstance: AxiosInstance;
+  private googleAuth = new GoogleAuth();
 
   constructor(
-    baseUrl: string,
+    private baseUrl: string,
     private securityConfig: ISecurityConfig,
   ) {
     this.axiosInstance = axios.create({
       baseURL: baseUrl,
-      headers: this.buildHeaders(),
     });
   }
 
-  private buildHeaders(): Record<string, string> {
-    const headers: Record<string, string> = {};
+  onModuleInit() {
+    this.setupAuthenticationInterceptor();
+  }
 
+  private setupAuthenticationInterceptor(): void {
     switch (this.securityConfig.type) {
       case SecurityType.API_KEY:
         if (!this.securityConfig.apiKey) {
           throw new Error('API Key no proporcionada.');
         }
-        headers['x-api-key'] = this.securityConfig.apiKey;
+        this.axiosInstance.defaults.headers.common['x-api-key'] =
+          this.securityConfig.apiKey;
         break;
-
       case SecurityType.BEARER_TOKEN:
         if (!this.securityConfig.token) {
           throw new Error('Token JWT no proporcionado.');
         }
-        headers['Authorization'] = `Bearer ${this.securityConfig.token}`;
+        this.axiosInstance.defaults.headers.common['Authorization'] =
+          `Bearer ${this.securityConfig.token}`;
         break;
+      case SecurityType.GOOGLE_CLOUD_RUN_AUTH:
+        const localIdToken = this.securityConfig.cloudRunIdToken;
 
+        if (localIdToken) {
+          this.axiosInstance.defaults.headers.common['Authorization'] =
+            `Bearer ${localIdToken}`;
+          this.logger.log('Using local ID token for Cloud Run authentication.');
+        } else {
+          // Lógica para Cloud Run real (producción)
+          if (!this.securityConfig.cloudRunTargetUrl) {
+            throw new Error('URL de destino de Cloud Run no proporcionada.');
+          }
+          this.axiosInstance.interceptors.request.use(async (config) => {
+            const client = await new GoogleAuth().getIdTokenClient(
+              this.securityConfig.cloudRunTargetUrl,
+            );
+            const token = (await client.getAccessToken()).token;
+            if (token) {
+              config.headers.Authorization = `Bearer ${token}`;
+            }
+            return config;
+          });
+          this.logger.log(
+            'Configured Cloud Run authentication for production environment.',
+          );
+        }
+        break;
       case SecurityType.NONE:
         break;
-
       default:
         throw new Error('Tipo de seguridad no válido.');
     }
-
-    return headers;
   }
 
   async get(endpoint: string, params?: Record<string, any>): Promise<T> {

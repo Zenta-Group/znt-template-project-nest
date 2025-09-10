@@ -1,0 +1,22 @@
+{
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  "low": true,
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "skip-dev": true,
+  "package-manager": "npm",
+  "show-found": true,
+  "report-type": "important",
+
+  "allowlist": [
+    "debug",
+    "@google-cloud/firestore",
+    "ansi-regex",
+    "ansi-styles",
+    "wrap-ansi",
+    "strip-ansi"
+  ],
+
+  "allowlist-advisories": ["GHSA-2rv4-jp6r-xgq7", "GHSA-vfjc-p7x3-q864"]
+}

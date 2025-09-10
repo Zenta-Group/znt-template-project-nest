@@ -1,4 +1,4 @@
-export class Generic {
+export interface Generic {
   id: string;
   name: string;
   description: string;

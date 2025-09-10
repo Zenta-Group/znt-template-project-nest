@@ -14,6 +14,14 @@ export function validate(config: Record<string, any>) {
     EXTERNAL_API_SECURITY_TYPE: Joi.string().required().default('none'),
     EXTERNAL_API_KEY: Joi.string().allow('').optional(),
     EXTERNAL_API_TOKEN: Joi.string().allow('').optional(),
+    CLOUD_RUN_API_BASE_URL: Joi.string().allow('').optional(),
+    CLOUD_RUN_TARGET_URL: Joi.string().allow('').optional(),
+    CLOUD_RUN_ID_TOKEN: Joi.string().allow('').optional(),
+    DB_HOST: Joi.string().default('localhost'),
+    DB_PORT: Joi.number().default(3306),
+    DB_USER: Joi.string().default('root'),
+    DB_PASS: Joi.string().default('root'),
+    DB_DB: Joi.string().default('appdb'),
   });
 
   const { error, value } = schema.validate(config, { allowUnknown: true });
