@@ -1,0 +1,6 @@
+projectKey=znt-template-project-nest
+serverUrl=https://sonar.zentalabs.com
+serverVersion=25.7.0.110598
+dashboardUrl=https://sonar.zentalabs.com/dashboard?id=znt-template-project-nest
+ceTaskId=31700b47-0199-46dc-aca6-bd0094f592ac
+ceTaskUrl=https://sonar.zentalabs.com/api/ce/task?id=31700b47-0199-46dc-aca6-bd0094f592ac

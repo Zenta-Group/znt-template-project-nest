@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, Index, OneToMany } from 'typeorm';
+import { Entity, PrimaryColumn, Column, Index } from 'typeorm';
 
 export enum PersonRole {
   USER = 'USER',

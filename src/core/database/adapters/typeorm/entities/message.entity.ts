@@ -45,7 +45,7 @@ export class MessageEntity {
   templateText: string | null;
 
   @Column({ name: 'variables', type: 'json', nullable: true })
-  variables: any | null;
+  variables: any;
 
   // Estado "actual" del mensaje (si decides normalizarlo aquí para acceso rápido)
   @Column({ name: 'status', type: 'varchar', length: 16, nullable: true })

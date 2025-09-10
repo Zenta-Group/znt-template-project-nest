@@ -3,8 +3,6 @@ import {
   CollectionReference,
   Query,
   Transaction,
-  DocumentReference,
-  QueryDocumentSnapshot,
 } from '@google-cloud/firestore';
 import {
   IBaseRepository,
@@ -17,8 +15,6 @@ import {
   ISpecification,
 } from 'src/shared/interfaces/repository.ports';
 
-type IdLike = string;
-
 type FirestoreOptions<P> = {
   collectionName: string;
   idField?: keyof P; // default 'id'
@@ -27,7 +23,7 @@ type FirestoreOptions<P> = {
 export class FirestoreRepository<
   D,
   P extends { id?: ID },
-  ID extends IdLike = string,
+  ID extends string = string,
 > implements IBaseRepository<D, P, ID>
 {
   constructor(
@@ -65,35 +61,43 @@ export class FirestoreRepository<
     if (!f) return q;
 
     for (const [k, v] of Object.entries(f)) {
-      if (k === '$and' || k === '$or' || k === '$not') continue; // Mantener simple: OR/NOT fuera del alcance
-      if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-        const c = v as any;
-        if ('eq' in c) q = q.where(k, '==', c.eq);
-        if ('ne' in c) q = q.where(k, '!=', c.ne);
-        if ('gt' in c) q = q.where(k, '>', c.gt);
-        if ('gte' in c) q = q.where(k, '>=', c.gte);
-        if ('lt' in c) q = q.where(k, '<', c.lt);
-        if ('lte' in c) q = q.where(k, '<=', c.lte);
-        if ('between' in c) {
-          q = q.where(k, '>=', c.between[0]).where(k, '<=', c.between[1]);
-        }
-        if ('in' in c) q = q.where(k, 'in', c.in);
-        if ('nin' in c) q = q.where(k, 'not-in', c.nin);
-        if ('arrayContains' in c)
-          q = q.where(k, 'array-contains', c.arrayContains);
-
-        // startsWith: rango [start, start + \uf8ff]
-        if ('startsWith' in c) {
-          const start = String(c.startsWith);
-          const end = start + '\uf8ff';
-          q = q.where(k, '>=', start).where(k, '<=', end);
-        }
-        // contains/endsWith no existen nativamente (necesitas motor de búsqueda externo)
-      } else {
-        q = q.where(k, '==', v);
-      }
+      if (this.isLogicalOperator(k)) continue;
+      q = this.applyFieldFilter(q, k, v);
     }
 
+    return q;
+  }
+
+  private isLogicalOperator(key: string): boolean {
+    return key === '$and' || key === '$or' || key === '$not';
+  }
+
+  private applyFieldFilter(q: Query, k: string, v: any): Query {
+    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+      return this.applyComplexFilter(q, k, v);
+    } else {
+      return q.where(k, '==', v);
+    }
+  }
+
+  private applyComplexFilter(q: Query, k: string, c: any): Query {
+    if ('eq' in c) q = q.where(k, '==', c.eq);
+    if ('ne' in c) q = q.where(k, '!=', c.ne);
+    if ('gt' in c) q = q.where(k, '>', c.gt);
+    if ('gte' in c) q = q.where(k, '>=', c.gte);
+    if ('lt' in c) q = q.where(k, '<', c.lt);
+    if ('lte' in c) q = q.where(k, '<=', c.lte);
+    if ('between' in c) {
+      q = q.where(k, '>=', c.between[0]).where(k, '<=', c.between[1]);
+    }
+    if ('in' in c) q = q.where(k, 'in', c.in);
+    if ('nin' in c) q = q.where(k, 'not-in', c.nin);
+    if ('arrayContains' in c) q = q.where(k, 'array-contains', c.arrayContains);
+    if ('startsWith' in c) {
+      const start = String(c.startsWith);
+      const end = start + '\uf8ff';
+      q = q.where(k, '>=', start).where(k, '<=', end);
+    }
     return q;
   }
 

@@ -27,7 +27,6 @@ import { SecurityValidationPipe } from 'src/shared/pipes/validations/security-va
 import { CsrfInterceptor } from 'src/shared/interceptors/csrf.interceptor';
 import { GenericsService } from './generics.service';
 import { CreateGenericDto } from './dtos/create-generic.dto';
-import { Generic } from 'src/shared/models/generic.model';
 import { UpdateGenericDto } from './dtos/update-generic.dto';
 import { GenericDto } from 'src/shared/dtos/generic.dto';
 

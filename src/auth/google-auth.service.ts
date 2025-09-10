@@ -48,7 +48,7 @@ export class GoogleAuthService implements IAuthService<string> {
         audience: clientId,
       });
       const payload = ticket.getPayload();
-      if (!payload || !payload.email) {
+      if (!payload?.email) {
         throw new InvalidTokenException('El token de Google no contiene email');
       }
 

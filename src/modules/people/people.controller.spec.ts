@@ -1,5 +1,4 @@
 import { PeopleController } from './people.controller';
-import { PeopleService } from './people.service';
 import { PersonDto } from './dtos/person.dto';
 import { PersonPageDto } from './dtos/person-page.dto';
 
@@ -17,20 +16,22 @@ describe('PeopleController', () => {
     };
     controller = new PeopleController(service);
   });
+  const ADMIN = 'ADMIN';
+  const USER = 'USER';
 
   it('debería crear usuario', async () => {
     const userMock = {
       id: '1',
       name: 'Juan',
       email: 'juan@mail.com',
-      role: 'ADMIN' as 'ADMIN',
+      role: ADMIN as 'ADMIN',
       status: true,
     };
     service.createUser.mockResolvedValue(userMock);
     const dto = {
       name: 'Juan',
       email: 'juan@mail.com',
-      role: 'ADMIN' as 'ADMIN',
+      role: ADMIN,
     } as any;
     const result = await controller.create(dto);
     expect(service.createUser).toHaveBeenCalledWith(
@@ -46,7 +47,7 @@ describe('PeopleController', () => {
       id: '2',
       name: 'Ana',
       email: 'ana@mail.com',
-      role: 'USER' as 'USER',
+      role: USER as 'USER',
       status: true,
     };
     service.createUser.mockResolvedValue(userMock);
@@ -92,7 +93,7 @@ describe('PeopleController', () => {
       id: '1',
       name: 'Juan',
       email: 'juan@mail.com',
-      role: 'ADMIN' as 'ADMIN',
+      role: ADMIN as 'ADMIN',
       status: true,
     };
     const page = { data: [userMock], total: 1, limit: 10, offset: 0 };
@@ -109,7 +110,7 @@ describe('PeopleController', () => {
       id: '1',
       name: 'Juan',
       email: 'juan@mail.com',
-      role: 'ADMIN' as 'ADMIN',
+      role: ADMIN as 'ADMIN',
       status: true,
     };
     service.getUserById.mockResolvedValue(userMock);
@@ -123,7 +124,7 @@ describe('PeopleController', () => {
       id: '1',
       name: 'Pedro',
       email: 'pedro@mail.com',
-      role: 'USER' as 'USER',
+      role: USER as 'USER',
       status: false,
     };
     service.updateUser.mockResolvedValue(userMock);

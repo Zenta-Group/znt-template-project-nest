@@ -14,13 +14,13 @@ import { GoogleAuth } from 'google-auth-library';
 
 @Injectable()
 export class AxiosService<T> implements IIntegrationService<T> {
-  private logger = new Logger('AxiosService');
-  private axiosInstance: AxiosInstance;
-  private googleAuth = new GoogleAuth();
+  private readonly logger = new Logger('AxiosService');
+  private readonly axiosInstance: AxiosInstance;
+  private readonly googleAuth = new GoogleAuth();
 
   constructor(
-    private baseUrl: string,
-    private securityConfig: ISecurityConfig,
+    private readonly baseUrl: string,
+    private readonly securityConfig: ISecurityConfig,
   ) {
     this.axiosInstance = axios.create({
       baseURL: baseUrl,

@@ -8,7 +8,6 @@ import { SearchConfirmationsDto } from './dtos/search-confirmations.dto';
 import {
   Filter,
   IBaseRepository,
-  Page,
   QueryOptions,
 } from 'src/shared/interfaces/repository.ports';
 import { Confirmation } from 'src/shared/models/confirmation.model';
@@ -54,39 +53,10 @@ export class ConfirmationsService {
       orderBy,
     } = params;
 
-    let by: keyof Confirmation = 'createdDatetime';
-    if (orderBy && this.ORDERABLE_FIELDS.includes(orderBy as any))
-      by = orderBy as any;
+    const by = this.getOrderBy(orderBy);
     const dir = toDir(order === 'ASC' ? 'ASC' : 'DESC');
-
-    const filter: Filter<Confirmation> =
-      mode === 'rut'
-        ? { rut: { eq: query } as any }
-        : { phoneNumber: { eq: query } as any };
-
-    if (startDate || endDate) {
-      const field = (dateField || 'createdDatetime') as keyof Confirmation;
-      if (startDate && endDate) {
-        const s = new Date(startDate);
-        const e = new Date(endDate);
-        if (e < s)
-          throw new BadRequestException(
-            'endDate must be greater than or equal to startDate. Minimum range is 1 day.',
-          );
-      }
-      const { startISO, endISO } = DateUtil.buildDateRangeISO(
-        startDate,
-        endDate,
-      );
-
-      if (startDate && !endDate) {
-        (filter as any)[field] = { gte: startISO };
-      } else if (!startDate && endDate) {
-        (filter as any)[field] = { lte: endISO };
-      } else if (startDate && endDate) {
-        (filter as any)[field] = { between: [startISO, endISO] };
-      }
-    }
+    const filter = this.buildBaseFilter(mode, query);
+    this.applyDateFilter(filter, startDate, endDate, dateField);
 
     const opts: QueryOptions<any> = {
       filter,
@@ -94,7 +64,50 @@ export class ConfirmationsService {
       pagination: { limit: Number(limit), offset: Number(offset) },
     };
 
-    const page = await this.confirmations.findMany(opts);
-    return page;
+    return this.confirmations.findMany(opts);
+  }
+
+  private getOrderBy(orderBy?: string): keyof Confirmation {
+    if (orderBy && this.ORDERABLE_FIELDS.includes(orderBy as any)) {
+      return orderBy as any;
+    }
+    return 'createdDatetime';
+  }
+
+  private buildBaseFilter(
+    mode: string | undefined,
+    query: any,
+  ): Filter<Confirmation> {
+    if (mode === 'rut') {
+      return { rut: { eq: query } as any };
+    }
+    return { phoneNumber: { eq: query } as any };
+  }
+
+  private applyDateFilter(
+    filter: Filter<Confirmation>,
+    startDate?: string,
+    endDate?: string,
+    dateField?: string,
+  ) {
+    if (!startDate && !endDate) return;
+    const field = (dateField || 'createdDatetime') as keyof Confirmation;
+    if (startDate && endDate) {
+      const s = new Date(startDate);
+      const e = new Date(endDate);
+      if (e < s) {
+        throw new BadRequestException(
+          'endDate must be greater than or equal to startDate. Minimum range is 1 day.',
+        );
+      }
+    }
+    const { startISO, endISO } = DateUtil.buildDateRangeISO(startDate, endDate);
+    if (startDate && !endDate) {
+      (filter as any)[field] = { gte: startISO };
+    } else if (!startDate && endDate) {
+      (filter as any)[field] = { lte: endISO };
+    } else if (startDate && endDate) {
+      (filter as any)[field] = { between: [startISO, endISO] };
+    }
   }
 }

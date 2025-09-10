@@ -20,7 +20,7 @@ export const CsrfFirestoreMapper: IEntityMapper<CsrfToken, CsrfDoc> = {
     return {
       id: String(d.id ?? ''),
       token: d.token,
-      createdAt: d.createdAt instanceof Date ? d.createdAt : d.createdAt,
+      createdAt: d.createdAt,
     };
   },
 };

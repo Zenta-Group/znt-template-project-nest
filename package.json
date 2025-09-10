@@ -60,8 +60,8 @@
     "@types/node": "20.17.16",
     "@types/passport-jwt": "4.0.1",
     "@types/supertest": "6.0.3",
-    "@typescript-eslint/eslint-plugin": "8.22.0",
-    "@typescript-eslint/parser": "8.22.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
     "eslint": "9.19.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
@@ -74,7 +74,8 @@
     "ts-loader": "9.5.1",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
-    "typescript": "5.7.3"
+    "typescript": "5.7.3",
+    "typescript-eslint": "^8.43.0"
   },
   "overrides": {
     "fastify": "^5.0.0",

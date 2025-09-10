@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
-import { Module, DynamicModule } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { FirestoreRepositoryFactory } from './firestore.factory';
 import { createFirestoreProvider } from './firestore.provider';
 import { FirestoreUnitOfWork } from './firestore.uow';

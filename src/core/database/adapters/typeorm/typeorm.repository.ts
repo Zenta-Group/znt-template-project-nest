@@ -8,7 +8,6 @@ import {
 import {
   IBaseRepository,
   IEntityMapper,
-  IUnitOfWork,
   Page,
   QueryOptions,
   RepoCapabilities,
@@ -62,63 +61,132 @@ export class TypeOrmRepository<
     if (!f) return;
     const ands: string[] = [];
     const params: Record<string, unknown> = {};
-    const push = (sql: string, key: string, value: unknown) => {
-      ands.push(sql);
-      params[key] = value;
-    };
+    for (const [k, v] of Object.entries(f)) {
+      if (k.startsWith('$')) continue;
+      this.applyFieldFilter(ands, params, alias, k, v);
+    }
 
-    Object.entries(f).forEach(([k, v]) => {
-      if (k.startsWith('$')) return;
-      const col = `${alias}.${k}`;
-      const kp = (s: string) => `${k}_${s}_${ands.length}`;
+    this.applyLogicalFilters(f, ands, params, alias);
 
-      if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-        const c = v as any;
-        if ('eq' in c) push(`${col} = :${kp('eq')}`, kp('eq'), c.eq);
-        if ('ne' in c) push(`${col} <> :${kp('ne')}`, kp('ne'), c.ne);
-        if ('gt' in c) push(`${col} > :${kp('gt')}`, kp('gt'), c.gt);
-        if ('gte' in c) push(`${col} >= :${kp('gte')}`, kp('gte'), c.gte);
-        if ('lt' in c) push(`${col} < :${kp('lt')}`, kp('lt'), c.lt);
-        if ('lte' in c) push(`${col} <= :${kp('lte')}`, kp('lte'), c.lte);
-        if ('between' in c) {
-          ands.push(`${col} BETWEEN :${kp('b0')} AND :${kp('b1')}`);
-          params[kp('b0')] = c.between[0];
-          params[kp('b1')] = c.between[1];
-        }
-        if ('in' in c) {
-          ands.push(`${col} IN (:...${kp('in')})`);
-          params[kp('in')] = c.in;
-        }
-        if ('nin' in c) {
-          ands.push(`${col} NOT IN (:...${kp('nin')})`);
-          params[kp('nin')] = c.nin;
-        }
-        if ('contains' in c)
-          push(
-            `${col} LIKE :${kp('contains')}`,
-            kp('contains'),
-            `%${c.contains}%`,
-          );
-        if ('startsWith' in c)
-          push(`${col} LIKE :${kp('sw')}`, kp('sw'), `${c.startsWith}%`);
-        if ('endsWith' in c)
-          push(`${col} LIKE :${kp('ew')}`, kp('ew'), `%${c.endsWith}`);
-        if ('exists' in c)
-          ands.push(`${col} IS ${c.exists ? 'NOT NULL' : 'NULL'}`);
-      } else {
-        push(`${col} = :${kp('eqp')}`, kp('eqp'), v);
+    if (ands.length) qb.andWhere(ands.join(' AND '), params);
+  }
+
+  private applyFieldFilter(
+    ands: string[],
+    params: Record<string, unknown>,
+    alias: string,
+    k: string,
+    v: any,
+  ) {
+    const col = `${alias}.${k}`;
+    const kp = (s: string) => `${k}_${s}_${ands.length}`;
+    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+      const c = v;
+      if ('eq' in c)
+        this.pushFilter(ands, params, `${col} = :${kp('eq')}`, kp('eq'), c.eq);
+      if ('ne' in c)
+        this.pushFilter(ands, params, `${col} <> :${kp('ne')}`, kp('ne'), c.ne);
+      if ('gt' in c)
+        this.pushFilter(ands, params, `${col} > :${kp('gt')}`, kp('gt'), c.gt);
+      if ('gte' in c)
+        this.pushFilter(
+          ands,
+          params,
+          `${col} >= :${kp('gte')}`,
+          kp('gte'),
+          c.gte,
+        );
+      if ('lt' in c)
+        this.pushFilter(ands, params, `${col} < :${kp('lt')}`, kp('lt'), c.lt);
+      if ('lte' in c)
+        this.pushFilter(
+          ands,
+          params,
+          `${col} <= :${kp('lte')}`,
+          kp('lte'),
+          c.lte,
+        );
+      if ('between' in c) {
+        ands.push(`${col} BETWEEN :${kp('b0')} AND :${kp('b1')}`);
+        params[kp('b0')] = c.between[0];
+        params[kp('b1')] = c.between[1];
       }
-    });
+      if ('in' in c) {
+        ands.push(`${col} IN (:...${kp('in')})`);
+        params[kp('in')] = c.in;
+      }
+      if ('nin' in c) {
+        ands.push(`${col} NOT IN (:...${kp('nin')})`);
+        params[kp('nin')] = c.nin;
+      }
+      if ('contains' in c)
+        this.pushFilter(
+          ands,
+          params,
+          `${col} LIKE :${kp('contains')}`,
+          kp('contains'),
+          `%${c.contains}%`,
+        );
+      if ('startsWith' in c)
+        this.pushFilter(
+          ands,
+          params,
+          `${col} LIKE :${kp('sw')}`,
+          kp('sw'),
+          `${c.startsWith}%`,
+        );
+      if ('endsWith' in c)
+        this.pushFilter(
+          ands,
+          params,
+          `${col} LIKE :${kp('ew')}`,
+          kp('ew'),
+          `%${c.endsWith}`,
+        );
+      if ('exists' in c)
+        ands.push(`${col} IS ${c.exists ? 'NOT NULL' : 'NULL'}`);
+    } else {
+      this.pushFilter(ands, params, `${col} = :${kp('eqp')}`, kp('eqp'), v);
+    }
+  }
 
+  private pushFilter(
+    ands: string[],
+    params: Record<string, unknown>,
+    sql: string,
+    key: string,
+    value: unknown,
+  ) {
+    ands.push(sql);
+    params[key] = value;
+  }
+
+  private applyLogicalFilters(
+    f: Filter<P>,
+    ands: string[],
+    params: Record<string, unknown>,
+    alias: string,
+  ) {
     if (f.$and?.length) {
-      f.$and.forEach((sf, i) => {
+      f.$and.forEach((sf) => {
         const sub = this.repo().createQueryBuilder(alias);
         this.applyFilter(sub, alias, sf);
-        const [sql, prms] = sub.getQueryAndParameters();
+        const [, prms] = sub.getQueryAndParameters();
         Object.assign(params, prms[0] ?? {});
-        ands.push(
-          `(${sub.expressionMap.wheres.map((w) => w.condition).join(' AND ')})`,
-        );
+        const subConds = sub.expressionMap.wheres
+          .map((w) => {
+            if (typeof w.condition === 'string') return w.condition;
+            if (
+              w.condition &&
+              typeof w.condition === 'object' &&
+              'toString' in w.condition
+            ) {
+              return w.condition.toString();
+            }
+            return JSON.stringify(w.condition) || '';
+          })
+          .join(' AND ');
+        ands.push(`(${subConds})`);
       });
     }
     if (f.$or?.length) {
@@ -126,21 +194,41 @@ export class TypeOrmRepository<
       f.$or.forEach((sf) => {
         const sub = this.repo().createQueryBuilder(alias);
         this.applyFilter(sub, alias, sf);
-        parts.push(
-          `(${sub.expressionMap.wheres.map((w) => w.condition).join(' AND ')})`,
-        );
+        const subConds = sub.expressionMap.wheres
+          .map((w) => {
+            if (typeof w.condition === 'string') return w.condition;
+            if (
+              w.condition &&
+              typeof w.condition === 'object' &&
+              'toString' in w.condition
+            ) {
+              return w.condition.toString();
+            }
+            return JSON.stringify(w.condition) || '';
+          })
+          .join(' AND ');
+        parts.push(`(${subConds})`);
       });
       if (parts.length) ands.push(`(${parts.join(' OR ')})`);
     }
     if (f.$not) {
       const sub = this.repo().createQueryBuilder(alias);
       this.applyFilter(sub, alias, f.$not);
-      ands.push(
-        `NOT (${sub.expressionMap.wheres.map((w) => w.condition).join(' AND ')})`,
-      );
+      const subConds = sub.expressionMap.wheres
+        .map((w) => {
+          if (typeof w.condition === 'string') return w.condition;
+          if (
+            w.condition &&
+            typeof w.condition === 'object' &&
+            'toString' in w.condition
+          ) {
+            return w.condition.toString();
+          }
+          return JSON.stringify(w.condition) || '';
+        })
+        .join(' AND ');
+      ands.push(`NOT (${subConds})`);
     }
-
-    if (ands.length) qb.andWhere(ands.join(' AND '), params);
   }
 
   async create(entity: D, ctx?: RepoCtx): Promise<D> {
