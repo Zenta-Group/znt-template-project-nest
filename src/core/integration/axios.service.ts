@@ -59,20 +59,51 @@ export class AxiosService<T> implements IIntegrationService<T> {
           }
           this.axiosInstance.interceptors.request.use(async (config) => {
             try {
-              const client = await new GoogleAuth().getIdTokenClient(
-                this.securityConfig.cloudRunTargetUrl,
-              );
-              const headers = await client.getRequestHeaders();
-              const authHeader =
-                headers['authorization'] || headers['Authorization'];
-              if (authHeader) {
-                config.headers.Authorization = authHeader;
+              // Para Cloud Run, usar el metadata server directamente
+              const metadataUrl = `http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience=${this.securityConfig.cloudRunTargetUrl}`;
+
+              const response = await axios.get(metadataUrl, {
+                headers: {
+                  'Metadata-Flavor': 'Google',
+                },
+                timeout: 5000,
+              });
+
+              if (response.data) {
+                config.headers.Authorization = `Bearer ${response.data}`;
+                this.logger.debug(
+                  'ID token obtained from metadata server for Cloud Run',
+                );
+              } else {
+                this.logger.warn('No ID token received from metadata server');
               }
             } catch (error) {
               this.logger.error(
-                'Error obtaining ID token for Cloud Run:',
-                error,
+                'Error obtaining ID token from metadata server:',
+                error.message,
               );
+
+              // Fallback usando GoogleAuth como antes
+              try {
+                const auth = new GoogleAuth();
+                const client = await auth.getIdTokenClient(
+                  this.securityConfig.cloudRunTargetUrl,
+                );
+                const headers = await client.getRequestHeaders();
+                const authHeader =
+                  headers['authorization'] || headers['Authorization'];
+                if (authHeader) {
+                  config.headers.Authorization = authHeader;
+                  this.logger.debug(
+                    'ID token obtained via GoogleAuth fallback',
+                  );
+                }
+              } catch (fallbackError) {
+                this.logger.error(
+                  'Fallback authentication also failed:',
+                  fallbackError.message,
+                );
+              }
             }
             return config;
           });
