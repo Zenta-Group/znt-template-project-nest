@@ -58,12 +58,21 @@ export class AxiosService<T> implements IIntegrationService<T> {
             throw new Error('URL de destino de Cloud Run no proporcionada.');
           }
           this.axiosInstance.interceptors.request.use(async (config) => {
-            const client = await new GoogleAuth().getIdTokenClient(
-              this.securityConfig.cloudRunTargetUrl,
-            );
-            const token = (await client.getAccessToken()).token;
-            if (token) {
-              config.headers.Authorization = `Bearer ${token}`;
+            try {
+              const client = await new GoogleAuth().getIdTokenClient(
+                this.securityConfig.cloudRunTargetUrl,
+              );
+              const headers = await client.getRequestHeaders();
+              const authHeader =
+                headers['authorization'] || headers['Authorization'];
+              if (authHeader) {
+                config.headers.Authorization = authHeader;
+              }
+            } catch (error) {
+              this.logger.error(
+                'Error obtaining ID token for Cloud Run:',
+                error,
+              );
             }
             return config;
           });
