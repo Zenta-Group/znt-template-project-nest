@@ -48,6 +48,12 @@ steps:
       - '--allow-unauthenticated'
       - '--port'
       - '3000'
+      - '--timeout'
+      - '300'
+      - '--cpu'
+      - '1'
+      - '--memory'
+      - '512Mi'
 
 options:
   logging: CLOUD_LOGGING_ONLY

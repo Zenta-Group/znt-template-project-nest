@@ -57,12 +57,17 @@ function makePinoOptions(): pino.LoggerOptions & { transport?: any } {
 async function bootstrap() {
   const prefix = 'api/v1/zenta';
 
+  console.log('Starting application...');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('PORT:', process.env.PORT);
+
   const pinoOpts = makePinoOptions();
   const adapter = new FastifyAdapter({
     logger: pinoOpts,
     disableRequestLogging: true,
   });
 
+  console.log('Creating NestJS application...');
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     adapter,
@@ -74,11 +79,15 @@ async function bootstrap() {
   const fastifyLogger = app.getHttpAdapter().getInstance().log as pino.Logger;
   app.useLogger(new AppLogger(fastifyLogger));
 
+  console.log('Setting up global pipes...');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   const configService = app.get(ConfigService);
   const port = configService.get('port');
 
+  console.log('Port from config:', port);
+
+  console.log('Enabling CORS...');
   await enableCors(app, configService);
   app.setGlobalPrefix(prefix);
 
@@ -96,11 +105,18 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`${prefix}/swagger-doc`, app, document);
 
+  // Health check endpoint simple
+  app.getHttpAdapter().get('/health', (req, res) => {
+    res.status(200).send({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  console.log('Starting server...');
   fastifyLogger.info(
     `Swagger running on http://localhost:${port}/${prefix}/swagger-doc`,
   );
 
   await app.listen(port, '0.0.0.0');
+  console.log(`App corriendo en http://localhost:${port}`);
   fastifyLogger.info(`App corriendo en http://localhost:${port}`);
 }
 
@@ -131,4 +147,7 @@ async function enableCors(app, configService: ConfigService) {
   }
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Error during bootstrap:', error);
+  process.exit(1);
+});

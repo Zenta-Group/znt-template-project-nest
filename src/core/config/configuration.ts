@@ -1,5 +1,5 @@
 export const configuration = () => ({
-  port: parseInt(process.env.APP_PORT, 10) || 3000,
+  port: parseInt(process.env.PORT || process.env.APP_PORT, 10) || 3000,
   listCors: process.env.LIST_CORS,
   secretKeyAuth: process.env.SECRETKEY_AUTH,
   tokenExpiration: process.env.TOKEN_EXPIRATION || '1h',

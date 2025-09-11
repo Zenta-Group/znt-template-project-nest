@@ -3,15 +3,16 @@ import * as Joi from 'joi';
 
 export function validate(config: Record<string, any>) {
   const schema = Joi.object({
+    PORT: Joi.number().default(3000),
     APP_PORT: Joi.number().default(3000),
-    LIST_CORS: Joi.string().required(),
+    LIST_CORS: Joi.string().optional(),
     SECRETKEY_AUTH: Joi.string().required(),
     TOKEN_EXPIRATION: Joi.string().default('1h'),
-    GOOGLE_CLIENT_ID: Joi.string().required(),
-    GCP_PROJECT_ID: Joi.string().required(),
+    GOOGLE_CLIENT_ID: Joi.string().optional(),
+    GCP_PROJECT_ID: Joi.string().optional(),
     GCP_FIRESTORE_DATABASE_ID: Joi.string().allow('').optional(),
-    EXTERNAL_API_BASE_URL: Joi.string().required(),
-    EXTERNAL_API_SECURITY_TYPE: Joi.string().required().default('none'),
+    EXTERNAL_API_BASE_URL: Joi.string().optional(),
+    EXTERNAL_API_SECURITY_TYPE: Joi.string().default('none'),
     EXTERNAL_API_KEY: Joi.string().allow('').optional(),
     EXTERNAL_API_TOKEN: Joi.string().allow('').optional(),
     CLOUD_RUN_API_BASE_URL: Joi.string().allow('').optional(),

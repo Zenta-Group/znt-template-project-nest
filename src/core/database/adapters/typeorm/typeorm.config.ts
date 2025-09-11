@@ -18,5 +18,12 @@ export function createTypeOrmOptions(
     entities: [GenericEntity, PersonEntity, ConfirmationEntity, MessageEntity],
     synchronize: false,
     logging: false,
+    connectTimeout: 10000, // 10 segundos
+    acquireTimeout: 10000, // 10 segundos
+    extra: {
+      connectionLimit: 10,
+      idleTimeout: 600000, // 10 minutos
+      acquireTimeout: 10000, // 10 segundos
+    },
   };
 }
