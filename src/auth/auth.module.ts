@@ -18,7 +18,7 @@ import { CoreModule } from 'src/core/core.module';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('secretKeyAuth'),
         signOptions: {
-          expiresIn: configService.get<string>('tokenExpiration') || '1h',
+          expiresIn: configService.get<string>('tokenExpiration') ?? '1h',
         },
       }),
       inject: [ConfigService],

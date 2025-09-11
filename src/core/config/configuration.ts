@@ -1,13 +1,13 @@
 export const configuration = () => ({
-  port: parseInt(process.env.PORT || process.env.APP_PORT, 10) || 3000,
+  port: parseInt(process.env.PORT ?? process.env.APP_PORT, 10) ?? 3000,
   listCors: process.env.LIST_CORS,
   secretKeyAuth: process.env.SECRETKEY_AUTH,
-  tokenExpiration: process.env.TOKEN_EXPIRATION || '1h',
+  tokenExpiration: process.env.TOKEN_EXPIRATION ?? '1h',
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   // Firebase / GCP
   gcpProjectId: process.env.GCP_PROJECT_ID,
   gcpKeyFile:
-    process.env.GCP_KEY_FILE || process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    process.env.GCP_KEY_FILE ?? process.env.GOOGLE_APPLICATION_CREDENTIALS,
   gcpFirestoreDatabaseId: process.env.GCP_FIRESTORE_DATABASE_ID,
   //Axios
   externalApiBaseUrl: process.env.EXTERNAL_API_BASE_URL,

@@ -48,11 +48,9 @@ export class AxiosService<T> implements IIntegrationService<T> {
           `Bearer ${this.securityConfig.token}`;
         break;
       case SecurityType.GOOGLE_CLOUD_RUN_AUTH:
-        const localIdToken = this.securityConfig.cloudRunIdToken;
-
-        if (localIdToken) {
+        if (this.securityConfig.cloudRunIdToken) {
           this.axiosInstance.defaults.headers.common['Authorization'] =
-            `Bearer ${localIdToken}`;
+            `Bearer ${this.securityConfig.cloudRunIdToken}`;
           this.logger.log('Using local ID token for Cloud Run authentication.');
         } else {
           // Lógica para Cloud Run real (producción)

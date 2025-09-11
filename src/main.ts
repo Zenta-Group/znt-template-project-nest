@@ -30,7 +30,7 @@ function makePinoOptions(): pino.LoggerOptions & { transport?: any } {
   }
 
   return {
-    level: process.env.LOG_LEVEL || (isDev ? 'debug' : 'info'),
+    level: process.env.LOG_LEVEL ?? (isDev ? 'debug' : 'info'),
     redact: {
       paths: ['req.headers.authorization', 'password', 'token'],
       remove: true,

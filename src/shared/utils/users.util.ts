@@ -7,13 +7,13 @@ export class UsersUtil {
   }
 
   static replaceIfNotEmpty<T>(value: T, replace: T): T {
-    return replace ? replace : value;
+    return replace ?? value;
   }
 
   /**
    * Finds matching roles by partial text (like)
    */
-  static findMatchingRoles = (query: string): PersonRole[] => {
+  static readonly findMatchingRoles = (query: string): PersonRole[] => {
     const roleMap: Record<string, PersonRole> = {
       ADMIN: PersonRole.ADMIN,
       USER: PersonRole.USER,

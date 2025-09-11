@@ -61,7 +61,7 @@ export class PeopleController {
   async create(@Body() createPeopleDto: CreatePeopleDto): Promise<PersonDto> {
     const allowedRoles: Array<'USER' | 'ADMIN'> = ['USER', 'ADMIN'];
     const role = allowedRoles.includes(createPeopleDto.role as any)
-      ? (createPeopleDto.role as 'USER' | 'ADMIN')
+      ? createPeopleDto.role
       : 'USER';
     const user = await this.peopleService.createUser(
       createPeopleDto.name,

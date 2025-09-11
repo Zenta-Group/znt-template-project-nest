@@ -80,74 +80,121 @@ export class TypeOrmRepository<
   ) {
     const col = `${alias}.${k}`;
     const kp = (s: string) => `${k}_${s}_${ands.length}`;
-    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-      const c = v;
-      if ('eq' in c)
-        this.pushFilter(ands, params, `${col} = :${kp('eq')}`, kp('eq'), c.eq);
-      if ('ne' in c)
-        this.pushFilter(ands, params, `${col} <> :${kp('ne')}`, kp('ne'), c.ne);
-      if ('gt' in c)
-        this.pushFilter(ands, params, `${col} > :${kp('gt')}`, kp('gt'), c.gt);
-      if ('gte' in c)
-        this.pushFilter(
-          ands,
-          params,
-          `${col} >= :${kp('gte')}`,
-          kp('gte'),
-          c.gte,
-        );
-      if ('lt' in c)
-        this.pushFilter(ands, params, `${col} < :${kp('lt')}`, kp('lt'), c.lt);
-      if ('lte' in c)
-        this.pushFilter(
-          ands,
-          params,
-          `${col} <= :${kp('lte')}`,
-          kp('lte'),
-          c.lte,
-        );
-      if ('between' in c) {
-        ands.push(`${col} BETWEEN :${kp('b0')} AND :${kp('b1')}`);
-        params[kp('b0')] = c.between[0];
-        params[kp('b1')] = c.between[1];
-      }
-      if ('in' in c) {
-        ands.push(`${col} IN (:...${kp('in')})`);
-        params[kp('in')] = c.in;
-      }
-      if ('nin' in c) {
-        ands.push(`${col} NOT IN (:...${kp('nin')})`);
-        params[kp('nin')] = c.nin;
-      }
-      if ('contains' in c)
-        this.pushFilter(
-          ands,
-          params,
-          `${col} LIKE :${kp('contains')}`,
-          kp('contains'),
-          `%${c.contains}%`,
-        );
-      if ('startsWith' in c)
-        this.pushFilter(
-          ands,
-          params,
-          `${col} LIKE :${kp('sw')}`,
-          kp('sw'),
-          `${c.startsWith}%`,
-        );
-      if ('endsWith' in c)
-        this.pushFilter(
-          ands,
-          params,
-          `${col} LIKE :${kp('ew')}`,
-          kp('ew'),
-          `%${c.endsWith}`,
-        );
-      if ('exists' in c)
-        ands.push(`${col} IS ${c.exists ? 'NOT NULL' : 'NULL'}`);
+
+    if (this.isComplexFilter(v)) {
+      this.applyComplexFieldFilter(ands, params, col, kp, v);
     } else {
       this.pushFilter(ands, params, `${col} = :${kp('eqp')}`, kp('eqp'), v);
     }
+  }
+
+  private isComplexFilter(v: any): boolean {
+    return v !== null && typeof v === 'object' && !Array.isArray(v);
+  }
+
+  private applyComplexFieldFilter(
+    ands: string[],
+    params: Record<string, unknown>,
+    col: string,
+    kp: (s: string) => string,
+    c: any,
+  ) {
+    this.applyComparisonFilters(ands, params, col, kp, c);
+    this.applyRangeFilters(ands, params, col, kp, c);
+    this.applyStringFilters(ands, params, col, kp, c);
+    this.applyExistenceFilter(ands, col, c);
+  }
+
+  private applyComparisonFilters(
+    ands: string[],
+    params: Record<string, unknown>,
+    col: string,
+    kp: (s: string) => string,
+    c: any,
+  ) {
+    if ('eq' in c)
+      this.pushFilter(ands, params, `${col} = :${kp('eq')}`, kp('eq'), c.eq);
+    if ('ne' in c)
+      this.pushFilter(ands, params, `${col} <> :${kp('ne')}`, kp('ne'), c.ne);
+    if ('gt' in c)
+      this.pushFilter(ands, params, `${col} > :${kp('gt')}`, kp('gt'), c.gt);
+    if ('gte' in c)
+      this.pushFilter(
+        ands,
+        params,
+        `${col} >= :${kp('gte')}`,
+        kp('gte'),
+        c.gte,
+      );
+    if ('lt' in c)
+      this.pushFilter(ands, params, `${col} < :${kp('lt')}`, kp('lt'), c.lt);
+    if ('lte' in c)
+      this.pushFilter(
+        ands,
+        params,
+        `${col} <= :${kp('lte')}`,
+        kp('lte'),
+        c.lte,
+      );
+  }
+
+  private applyRangeFilters(
+    ands: string[],
+    params: Record<string, unknown>,
+    col: string,
+    kp: (s: string) => string,
+    c: any,
+  ) {
+    if ('between' in c) {
+      ands.push(`${col} BETWEEN :${kp('b0')} AND :${kp('b1')}`);
+      params[kp('b0')] = c.between[0];
+      params[kp('b1')] = c.between[1];
+    }
+    if ('in' in c) {
+      ands.push(`${col} IN (:...${kp('in')})`);
+      params[kp('in')] = c.in;
+    }
+    if ('nin' in c) {
+      ands.push(`${col} NOT IN (:...${kp('nin')})`);
+      params[kp('nin')] = c.nin;
+    }
+  }
+
+  private applyStringFilters(
+    ands: string[],
+    params: Record<string, unknown>,
+    col: string,
+    kp: (s: string) => string,
+    c: any,
+  ) {
+    if ('contains' in c)
+      this.pushFilter(
+        ands,
+        params,
+        `${col} LIKE :${kp('contains')}`,
+        kp('contains'),
+        `%${c.contains}%`,
+      );
+    if ('startsWith' in c)
+      this.pushFilter(
+        ands,
+        params,
+        `${col} LIKE :${kp('sw')}`,
+        kp('sw'),
+        `${c.startsWith}%`,
+      );
+    if ('endsWith' in c)
+      this.pushFilter(
+        ands,
+        params,
+        `${col} LIKE :${kp('ew')}`,
+        kp('ew'),
+        `%${c.endsWith}`,
+      );
+  }
+
+  private applyExistenceFilter(ands: string[], col: string, c: any) {
+    if ('exists' in c) ands.push(`${col} IS ${c.exists ? 'NOT NULL' : 'NULL'}`);
   }
 
   private pushFilter(
@@ -168,67 +215,79 @@ export class TypeOrmRepository<
     alias: string,
   ) {
     if (f.$and?.length) {
-      f.$and.forEach((sf) => {
-        const sub = this.repo().createQueryBuilder(alias);
-        this.applyFilter(sub, alias, sf);
-        const [, prms] = sub.getQueryAndParameters();
-        Object.assign(params, prms[0] ?? {});
-        const subConds = sub.expressionMap.wheres
-          .map((w) => {
-            if (typeof w.condition === 'string') return w.condition;
-            if (
-              w.condition &&
-              typeof w.condition === 'object' &&
-              'toString' in w.condition
-            ) {
-              return w.condition.toString();
-            }
-            return JSON.stringify(w.condition) || '';
-          })
-          .join(' AND ');
-        ands.push(`(${subConds})`);
-      });
+      this.applyAndFilters(f.$and, ands, params, alias);
     }
     if (f.$or?.length) {
-      const parts: string[] = [];
-      f.$or.forEach((sf) => {
-        const sub = this.repo().createQueryBuilder(alias);
-        this.applyFilter(sub, alias, sf);
-        const subConds = sub.expressionMap.wheres
-          .map((w) => {
-            if (typeof w.condition === 'string') return w.condition;
-            if (
-              w.condition &&
-              typeof w.condition === 'object' &&
-              'toString' in w.condition
-            ) {
-              return w.condition.toString();
-            }
-            return JSON.stringify(w.condition) || '';
-          })
-          .join(' AND ');
-        parts.push(`(${subConds})`);
-      });
-      if (parts.length) ands.push(`(${parts.join(' OR ')})`);
+      this.applyOrFilters(f.$or, ands, params, alias);
     }
     if (f.$not) {
-      const sub = this.repo().createQueryBuilder(alias);
-      this.applyFilter(sub, alias, f.$not);
-      const subConds = sub.expressionMap.wheres
-        .map((w) => {
-          if (typeof w.condition === 'string') return w.condition;
-          if (
-            w.condition &&
-            typeof w.condition === 'object' &&
-            'toString' in w.condition
-          ) {
-            return w.condition.toString();
-          }
-          return JSON.stringify(w.condition) || '';
-        })
-        .join(' AND ');
-      ands.push(`NOT (${subConds})`);
+      this.applyNotFilter(f.$not, ands, params, alias);
     }
+  }
+
+  private applyAndFilters(
+    andFilters: Filter<P>[],
+    ands: string[],
+    params: Record<string, unknown>,
+    alias: string,
+  ) {
+    andFilters.forEach((sf) => {
+      const subConditions = this.buildSubQueryConditions(sf, alias);
+      const [, prms] = subConditions.getQueryAndParameters();
+      Object.assign(params, prms[0] ?? {});
+      const conditionString = this.extractConditionsFromQuery(subConditions);
+      ands.push(`(${conditionString})`);
+    });
+  }
+
+  private applyOrFilters(
+    orFilters: Filter<P>[],
+    ands: string[],
+    params: Record<string, unknown>,
+    alias: string,
+  ) {
+    const parts: string[] = [];
+    orFilters.forEach((sf) => {
+      const subConditions = this.buildSubQueryConditions(sf, alias);
+      const conditionString = this.extractConditionsFromQuery(subConditions);
+      parts.push(`(${conditionString})`);
+    });
+    if (parts.length) ands.push(`(${parts.join(' OR ')})`);
+  }
+
+  private applyNotFilter(
+    notFilter: Filter<P>,
+    ands: string[],
+    params: Record<string, unknown>,
+    alias: string,
+  ) {
+    const subConditions = this.buildSubQueryConditions(notFilter, alias);
+    const conditionString = this.extractConditionsFromQuery(subConditions);
+    ands.push(`NOT (${conditionString})`);
+  }
+
+  private buildSubQueryConditions(filter: Filter<P>, alias: string) {
+    const sub = this.repo().createQueryBuilder(alias);
+    this.applyFilter(sub, alias, filter);
+    return sub;
+  }
+
+  private extractConditionsFromQuery(queryBuilder: any): string {
+    return queryBuilder.expressionMap.wheres
+      .map((w) => this.extractSingleCondition(w))
+      .join(' AND ');
+  }
+
+  private extractSingleCondition(where: any): string {
+    if (typeof where.condition === 'string') return where.condition;
+    if (
+      where.condition &&
+      typeof where.condition === 'object' &&
+      'toString' in where.condition
+    ) {
+      return where.condition.toString();
+    }
+    return JSON.stringify(where.condition) || '';
   }
 
   async create(entity: D, ctx?: RepoCtx): Promise<D> {

@@ -28,14 +28,14 @@ export class GoogleAuthService implements IAuthService<string> {
     private readonly userRepository: IBaseRepository<User, any, string>,
     private readonly csrfService: CsrfService,
   ) {
-    this.jwtSecret = this.configService.get<string>('secretKeyAuth') || '';
+    this.jwtSecret = this.configService.get<string>('secretKeyAuth') ?? '';
     this.tokenExpiration =
-      this.configService.get<string>('tokenExpiration') || '1h';
+      this.configService.get<string>('tokenExpiration') ?? '1h';
   }
 
   public async signIn(tokenSesion: string): Promise<LoginRs> {
     const rs = new LoginRs();
-    const clientId = this.configService.get<string>('googleClientId') || '';
+    const clientId = this.configService.get<string>('googleClientId') ?? '';
     if (!clientId) {
       this.logger.error('Falta configurar GOOGLE_CLIENT_ID');
       throw new GenericAuthException('Falta configurar GOOGLE_CLIENT_ID');
@@ -74,7 +74,7 @@ export class GoogleAuthService implements IAuthService<string> {
       userData.role = user.role;
       rs.data = userData;
       rs.token = this.jwtService.sign(
-        { id: user.id, email: user.email, role: user.role || 'USER' },
+        { id: user.id, email: user.email, role: user.role ?? 'USER' },
         {
           secret: this.jwtSecret,
           expiresIn: this.tokenExpiration,
