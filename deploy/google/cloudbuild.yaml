@@ -3,7 +3,7 @@ steps:
     name: gcr.io/cloud-builders/git
     args: ['fetch', '--unshallow']
 
-   - id: 'Install deps'
+  - id: 'Install deps'
     name: 'gcr.io/cloud-builders/npm'
     args: ['ci']
 
