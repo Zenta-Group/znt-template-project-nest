@@ -25,7 +25,7 @@ steps:
       - -lc
       - |
         node -v && npm -v
-        npx jest --coverage --coverageReporters=lcov,text-summary --maxWorkers=50%
+        npx jest --coverage
 
   # 3) Sonar (instalar Node 22 en Alpine y pasarlo al analizador)
   - id: 'Sonar'
