@@ -42,8 +42,10 @@ function makePinoOptions(): pino.LoggerOptions & { transport?: any } {
         if (
           obj &&
           typeof obj === 'object' &&
-          ((obj as any).msg?.includes('incoming request') ||
-            (obj as any).msg?.includes('request completed'))
+          'msg' in obj &&
+          typeof obj.msg === 'string' &&
+          (obj.msg.includes('incoming request') ||
+            obj.msg.includes('request completed'))
         ) {
           return;
         }

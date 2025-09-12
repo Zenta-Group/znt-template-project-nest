@@ -10,6 +10,7 @@ steps:
       - '-Dsonar.host.url=${_SONAR_URL}'
       - '-Dsonar.token=${_SONAR_TOKEN}'
       - '-Dsonar.projectKey=${_COMPONENT_NAME}'
+      - '-Dproject.settings=sonar.properties'
 
   - id: 'Build docker image'
     name: 'gcr.io/cloud-builders/docker'

@@ -91,7 +91,7 @@ export class AxiosService<T> implements IIntegrationService<T> {
                 );
                 const headers = await client.getRequestHeaders();
                 const authHeader =
-                  headers['authorization'] || headers['Authorization'];
+                  headers['authorization'] ?? headers['Authorization'];
                 if (authHeader) {
                   config.headers.Authorization = authHeader;
                   this.logger.debug(
