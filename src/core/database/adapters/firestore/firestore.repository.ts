@@ -197,7 +197,7 @@ export class FirestoreRepository<
 
     const snap = await query.get();
     const rows = snap.docs.map((d) =>
-      this.mapper.toDomain({ id: d.id, ...(d.data() || {}) } as P),
+      this.mapper.toDomain({ id: d.id, ...(d.data() ?? {}) } as P),
     );
     const last = snap.docs[snap.docs.length - 1];
     return { data: rows, limit: pagination?.limit, cursorNext: last?.id };

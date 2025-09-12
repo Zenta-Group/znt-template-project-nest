@@ -3,6 +3,14 @@ steps:
     name: gcr.io/cloud-builders/git
     args: ['fetch', '--unshallow']
 
+   - id: 'Install deps'
+    name: 'gcr.io/cloud-builders/npm'
+    args: ['ci']
+
+  - id: 'Run unit tests (coverage)'
+    name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'test:ci']
+
   - id: 'Sonar'
     name: 'sonarsource/sonar-scanner-cli:5.0'
     entrypoint: 'sonar-scanner'

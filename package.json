@@ -22,6 +22,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:ci": "jest --coverage --coverageReporters=lcov,text-summary",
     "audit:prod": "npx audit-ci --config ./audit-ci.json --package-manager npm --skip-dev",
     "audit:report": "npx audit-ci --config ./audit-ci.json --package-manager npm --skip-dev --show-found"
   },
