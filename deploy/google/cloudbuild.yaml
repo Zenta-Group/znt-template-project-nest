@@ -3,22 +3,48 @@ steps:
     name: gcr.io/cloud-builders/git
     args: ['fetch', '--unshallow']
 
-  - id: 'Install deps'
-    name: 'gcr.io/cloud-builders/npm'
-    args: ['ci']
+  # 1) Instalar deps con Node 22 (no usar cloud-builders/npm)
+  - id: 'Install deps (Node 22)'
+    name: 'node:22-bullseye'
+    entrypoint: 'bash'
+    args:
+      - -lc
+      - |
+        node -v && npm -v
+        npm ci
 
+  # 2) Correr tests y generar coverage en /workspace/coverage/lcov.info
   - id: 'Run unit tests (coverage)'
-    name: 'gcr.io/cloud-builders/npm'
-    args: ['run', 'test:ci']
+    name: 'node:22-bullseye'
+    entrypoint: 'bash'
+    env:
+      # Más estable en builders con pocos CPUs/memoria
+      - 'CI=true'
+      - 'NODE_OPTIONS=--max-old-space-size=2048'
+    args:
+      - -lc
+      - |
+        node -v && npm -v
+        npx jest --coverage --coverageReporters=lcov,text-summary --maxWorkers=50%
 
+  # 3) Sonar (instalar Node 22 en Alpine y pasarlo al analizador)
   - id: 'Sonar'
     name: 'sonarsource/sonar-scanner-cli:5.0'
-    entrypoint: 'sonar-scanner'
+    entrypoint: 'sh'
     args:
-      - '-Dsonar.host.url=${_SONAR_URL}'
-      - '-Dsonar.token=${_SONAR_TOKEN}'
-      - '-Dsonar.projectKey=${_COMPONENT_NAME}'
-      - '-Dproject.settings=sonar.properties'
+      - -lc
+      - |
+        # Node LTS para el analizador JS/TS (evita "embedded node" en Alpine)
+        apk add --no-cache nodejs-current >/dev/null
+        node -v
+        sonar-scanner \
+          -Dsonar.host.url=${_SONAR_URL} \
+          -Dsonar.token=${_SONAR_TOKEN} \
+          -Dsonar.projectKey=${_COMPONENT_NAME} \
+          -Dproject.settings=sonar.properties \
+          -Dsonar.nodejs.executable=$(which node)
+        # Si prefieres, puedes forzar aquí la ruta del LCOV:
+        # -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
 
   - id: 'Build docker image'
     name: 'gcr.io/cloud-builders/docker'
