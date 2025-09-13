@@ -1921,7 +1921,6 @@ refactor(core): optimize database connection
 ### **Ejemplos y Templates**
 
 - [Nest Tools Template](https://github.com/Zenta-Group/nest-tools-template/tree/main)
-- [Arquitectura Hexagonal Examples](https://github.com/Zenta-Group/hexagonal-architecture-examples)
 
 ### **Herramientas Recomendadas**
 
@@ -1935,7 +1934,6 @@ refactor(core): optimize database connection
 
 - **Issues**: Reportar bugs en GitHub Issues
 - **Discussions**: Discusiones técnicas en GitHub Discussions
-- **Slack**: Canal #backend-nestjs en Zenta Slack
 - **Code Reviews**: Proceso obligatorio para todos los PRs
 
 ---
