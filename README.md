@@ -2,30 +2,30 @@
 
 Este es un proyecto base construido con **NestJS** que sigue los principios de **Arquitectura Hexagonal**, **SOLID** y **buenas prácticas de desarrollo**. Está diseñado para ser utilizado como plantilla para nuevos proyectos, permitiendo una rápida configuración y escalabilidad.
 
-## 📋 **Tabla de Contenidos**
+## **Tabla de Contenidos**
 
-1. [Requisitos Previos](#requisitos-previos)
-2. [Instalación y Configuración](#instalación-y-configuración)
-3. [Arquitectura del Proyecto](#arquitectura-del-proyecto)
-4. [Estructura del Proyecto](#estructura-del-proyecto)
-5. [Adapters de Base de Datos](#adapters-de-base-de-datos)
-6. [Servicio de Integración Axios](#servicio-de-integración-axios)
-7. [Principios y Buenas Prácticas](#principios-y-buenas-prácticas)
-8. [Variables de Entorno](#variables-de-entorno)
-9. [Comandos Disponibles](#comandos-disponibles)
+1. [Requisitos previos](#requisitos-previos)
+2. [Instalacion y configuracion](#instalacion-y-configuracion)
+3. [Arquitectura del proyecto](#arquitectura-del-proyecto)
+4. [Estructura del proyecto](#estructura-del-proyecto)
+5. [Adapters de base de datos](#adapters-de-base-de-datos)
+6. [Servicio de integracion axios](#servicio-de-integracion-axios)
+7. [Principios y buenas practicas](#principios-y-buenas-practicas)
+8. [Variables de entorno](#variables-de-entorno)
+9. [Comandos disponibles](#comandos-disponibles)
 10. [Testing](#testing)
-11. [SonarQube](#sonarqube)
+11. [Sonarqube](#sonarqube)
 12. [Swagger](#swagger)
-13. [Docker y Cloud Run](#docker-y-cloud-run)
-14. [Custom Logger](#custom-logger)
-15. [Validaciones de Seguridad](#validaciones-de-seguridad)
-16. [Distribución y Despliegue](#distribución-y-despliegue)
+13. [Docker y cloud run](#docker-y-cloud-run)
+14. [Custom logger](#custom-logger)
+15. [Validaciones de seguridad](#validaciones-de-seguridad)
+16. [Distribucion y despliegue](#distribucion-y-despliegue)
 17. [Contribuciones](#contribuciones)
-18. [Recursos Adicionales](#recursos-adicionales)
+18. [Recursos adicionales](#recursos-adicionales)
 
 ---
 
-## 🛠️ **Requisitos Previos**
+## Requisitos previos
 
 Antes de comenzar, asegúrate de tener instalado lo siguiente en tu entorno de desarrollo:
 
@@ -38,7 +38,7 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente en tu entorno de d
 
 ---
 
-## 🔧 **Instalación y Configuración**
+## Instalacion y configuracion
 
 ### 1. Clonar el Repositorio
 
@@ -123,20 +123,20 @@ El servidor estará disponible en `http://localhost:3000` y la documentación Sw
 
 ---
 
-## 🏗️ **Arquitectura del Proyecto**
+## Arquitectura del proyecto
 
 Este proyecto implementa **Arquitectura Hexagonal** (también conocida como Ports & Adapters), que proporciona las siguientes ventajas:
 
-### **Principios Arquitectónicos**
+### Principios arquitectonicos
 
 1. **Separación de Responsabilidades**: Cada capa tiene una responsabilidad específica
 2. **Inversión de Dependencias**: Las capas internas no dependen de las externas
 3. **Testabilidad**: Cada componente puede ser probado de forma aislada
 4. **Flexibilidad**: Fácil intercambio de implementaciones (bases de datos, APIs externas)
 
-### **Capas de la Arquitectura**
+### Capas de la arquitectura
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    INFRASTRUCTURE LAYER                     │
 │  Controllers, Database Adapters, External APIs, Configs     │
@@ -144,12 +144,12 @@ Este proyecto implementa **Arquitectura Hexagonal** (también conocida como Port
 │                    APPLICATION LAYER                        │
 │         Services, Use Cases, Business Logic                 │
 ├─────────────────────────────────────────────────────────────┤
-│                      DOMAIN LAYER                          │
-│     Entities, Value Objects, Interfaces, Business Rules    │
+│                      DOMAIN LAYER                           │
+│     Entities, Value Objects, Interfaces, Business Rules     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### **Adaptadores Implementados**
+### Adaptadores implementados
 
 - **Database Adapters**: Firestore y TypeORM (MySQL)
 - **Integration Adapters**: Axios con múltiples tipos de autenticación
@@ -157,63 +157,65 @@ Este proyecto implementa **Arquitectura Hexagonal** (también conocida como Port
 
 ---
 
-## 📂 **Estructura del Proyecto**
+## Estructura del proyecto
 
 La estructura del proyecto está organizada siguiendo los principios de modularidad y separación de responsabilidades:
 
-```
+```text
+
 src/
-├── app.module.ts           # Módulo principal de la aplicación
-├── main.ts                # Punto de entrada de la aplicación
-├── auth/                  # Módulo de autenticación
-│   ├── auth.controller.ts
-│   ├── auth.service.ts
-│   ├── google-auth.service.ts
-│   └── auth.module.ts
-├── core/                  # Núcleo de la aplicación
-│   ├── config/           # Configuraciones globales
-│   │   ├── configuration.ts
-│   │   ├── validation.ts
-│   │   └── axios.configuration.ts
-│   ├── database/         # Módulo de base de datos
-│   │   ├── database.module.ts
-│   │   └── adapters/     # Adaptadores de BD
-│   │       ├── firestore/
-│   │       └── typeorm/
-│   ├── integration/      # Servicios de integración
-│   │   ├── axios.service.ts
-│   │   └── integration.module.ts
-│   └── logger/          # Sistema de logging
-│       └── app.logger.ts
-├── modules/              # Módulos de negocio
-│   ├── users/           # Ejemplo de módulo de dominio
-│   ├── confirmations/
-│   ├── generics/
-│   ├── messages/
-│   └── people/
-└── shared/              # Recursos compartidos
-    ├── constants/       # Constantes globales
-    ├── dtos/           # DTOs compartidos
-    ├── exceptions/     # Excepciones personalizadas
-    ├── guards/         # Guards de autenticación/autorización
-    ├── interceptors/   # Interceptores HTTP
-    ├── interfaces/     # Interfaces globales
-    ├── models/         # Modelos de datos
-    ├── pipes/          # Pipes de validación
-    ├── services/       # Servicios compartidos
-    └── utils/          # Utilidades
+├── app.module.ts # Módulo principal de la aplicación
+├── main.ts # Punto de entrada de la aplicación
+├── auth/ # Módulo de autenticación
+│ ├── auth.controller.ts
+│ ├── auth.service.ts
+│ ├── google-auth.service.ts
+│ └── auth.module.ts
+├── core/ # Núcleo de la aplicación
+│ ├── config/ # Configuraciones globales
+│ │ ├── configuration.ts
+│ │ ├── validation.ts
+│ │ └── axios.configuration.ts
+│ ├── database/ # Módulo de base de datos
+│ │ ├── database.module.ts
+│ │ └── adapters/ # Adaptadores de BD
+│ │ ├── firestore/
+│ │ └── typeorm/
+│ ├── integration/ # Servicios de integración
+│ │ ├── axios.service.ts
+│ │ └── integration.module.ts
+│ └── logger/ # Sistema de logging
+│ └── app.logger.ts
+├── modules/ # Módulos de negocio
+│ ├── users/ # Ejemplo de módulo de dominio
+│ ├── confirmations/
+│ ├── generics/
+│ ├── messages/
+│ └── people/
+└── shared/ # Recursos compartidos
+├── constants/ # Constantes globales
+├── dtos/ # DTOs compartidos
+├── exceptions/ # Excepciones personalizadas
+├── guards/ # Guards de autenticación/autorización
+├── interceptors/ # Interceptores HTTP
+├── interfaces/ # Interfaces globales
+├── models/ # Modelos de datos
+├── pipes/ # Pipes de validación
+├── services/ # Servicios compartidos
+└── utils/ # Utilidades
+
 ```
 
-### **Descripción de Directorios**
+### Descripcion de directorios
 
-#### **Core Module**
+#### Core module
 
 - **Config**: Configuraciones globales de la aplicación, axios y validaciones
 - **Database**: Implementación de múltiples adaptadores de base de datos
 - **Integration**: Servicios para integración con APIs externas
 - **Logger**: Sistema de logging personalizado
 
-#### **Shared Module**
+#### Shared module
 
 Recursos reutilizables en toda la aplicación:
 
@@ -228,26 +230,28 @@ Recursos reutilizables en toda la aplicación:
 - **Services**: Servicios utilitarios compartidos
 - **Utils**: Funciones utilitarias
 
-#### **Modules (Módulos de Negocio)**
+#### Modules (modulos de negocio)
 
 Cada módulo de negocio sigue esta estructura estándar:
 
-```
+```text
+
 modules/
 └── [nombre-modulo]/
-    ├── [nombre].controller.ts     # Controlador HTTP
-    ├── [nombre].service.ts        # Lógica de negocio
-    ├── [nombre].module.ts         # Configuración del módulo
-    ├── dtos/                      # DTOs específicos del módulo
-    │   ├── create-[nombre].dto.ts
-    │   ├── update-[nombre].dto.ts
-    │   └── response-[nombre].dto.ts
-    └── [tests]                    # Archivos de prueba
-        ├── [nombre].controller.spec.ts
-        └── [nombre].service.spec.ts
+├── [nombre].controller.ts # Controlador HTTP
+├── [nombre].service.ts # Lógica de negocio
+├── [nombre].module.ts # Configuración del módulo
+├── dtos/ # DTOs específicos del módulo
+│ ├── create-[nombre].dto.ts
+│ ├── update-[nombre].dto.ts
+│ └── response-[nombre].dto.ts
+└── [tests] # Archivos de prueba
+├── [nombre].controller.spec.ts
+└── [nombre].service.spec.ts
+
 ```
 
-#### **Auth Module**
+#### Auth module
 
 Maneja toda la lógica de autenticación y autorización:
 
@@ -257,17 +261,17 @@ Maneja toda la lógica de autenticación y autorización:
 
 ---
 
-## 🗄️ **Adapters de Base de Datos**
+## Adapters de base de datos
 
 El proyecto implementa múltiples adaptadores de base de datos siguiendo el patrón Repository, permitiendo flexibilidad en la elección del sistema de persistencia.
 
-### **Adaptadores Disponibles**
+### Adaptadores disponibles
 
-#### **1. Firestore Adapter**
+#### 1. Firestore adapter
 
 Para aplicaciones que requieren una base de datos NoSQL escalable de Google Cloud.
 
-**Configuración:**
+**Configuracion:**
 
 ```typescript
 // Variables de entorno requeridas
@@ -275,7 +279,7 @@ GCP_PROJECT_ID = tu - proyecto - gcp;
 GCP_FIRESTORE_DATABASE_ID = tu - database - id;
 ```
 
-**Uso en módulos:**
+**Uso en modulos:**
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -290,7 +294,7 @@ import { FirestoreModule } from 'src/core/database/adapters/firestore/firestore.
 export class TuModulo {}
 ```
 
-**Implementación de repositorio:**
+**Implementacion de repositorio:**
 
 ```typescript
 import { Injectable, Inject } from '@nestjs/common';
@@ -310,11 +314,11 @@ export class UserService {
 }
 ```
 
-#### **2. TypeORM Adapter (MySQL)**
+#### 2. TypeORM adapter (MySQL)
 
 Para aplicaciones que requieren una base de datos relacional robusta.
 
-**Configuración:**
+**Configuracion:**
 
 ```typescript
 // Variables de entorno requeridas
@@ -363,7 +367,7 @@ export class UserService {
 }
 ```
 
-### **Unit of Work Pattern**
+### Unit of Work pattern
 
 Ambos adapters implementan el patrón Unit of Work para transacciones:
 
@@ -388,7 +392,7 @@ export class UserService {
 
 ---
 
-## 🔌 **Servicio de Integración Axios**
+## Servicio de integracion axios
 
 El servicio Axios proporciona una abstracción robusta para comunicación con APIs externas, incluyendo servicios en Cloud Run.
 
@@ -569,7 +573,7 @@ try {
 
 ---
 
-## 📚 **Principios y Buenas Prácticas**
+## Principios y buenas practicas
 
 Este proyecto sigue los siguientes principios y buenas prácticas:
 
@@ -598,7 +602,7 @@ Este proyecto sigue los siguientes principios y buenas prácticas:
 
 ---
 
-## 🌐 **Variables de Entorno**
+## Variables de entorno
 
 | Variable                     | Descripción                                    | Ejemplo                                                    |
 | ---------------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
@@ -625,7 +629,7 @@ Este proyecto sigue los siguientes principios y buenas prácticas:
 
 ---
 
-## ▶️ **Comandos Disponibles**
+## Comandos disponibles
 
 | Comando                | Descripción                                     |
 | ---------------------- | ----------------------------------------------- |
@@ -646,7 +650,7 @@ Este proyecto sigue los siguientes principios y buenas prácticas:
 
 ---
 
-## 🧪 **Testing**
+## Testing
 
 El proyecto implementa una estrategia de testing comprehensiva con **Jest** como framework principal.
 
@@ -843,7 +847,7 @@ open coverage/lcov-report/index.html
 
 ---
 
-## 🔍 **SonarQube**
+## Sonarqube
 
 El proyecto incluye integración completa con **SonarQube** para análisis estático de código y métricas de calidad.
 
@@ -943,7 +947,7 @@ sonar-scanner \
 
 ---
 
-## 📄 **Swagger**
+## Swagger
 
 El proyecto incluye integración completa con **Swagger** para documentar todos los endpoints de la API. Es **obligatorio** documentar cada endpoint siguiendo las mejores prácticas.
 
@@ -951,7 +955,7 @@ El proyecto incluye integración completa con **Swagger** para documentar todos 
 
 Una vez levantado el servidor, la documentación estará disponible en:
 
-```
+```curl
 http://localhost:3000/api/v1/zenta/swagger-doc
 ```
 
@@ -1104,7 +1108,7 @@ SwaggerModule.setup('api/v1/zenta/swagger-doc', app, document);
 
 ---
 
-## 🐳 **Docker y Cloud Run**
+## Docker y cloud run
 
 El proyecto está optimizado para despliegue en contenedores Docker y Google Cloud Run.
 
@@ -1154,36 +1158,75 @@ docker run -p 3000:3000 \
 
 #### **Pipeline de CI/CD (Cloud Build)**
 
-El archivo `deploy/google/cloudbuild.yaml` automatiza el despliegue:
+El archivo `deploy/google/cloudbuild.yaml` automatiza el despliegue. Ejemplo actualizado:
 
 ```yaml
 steps:
-  # Análisis de código con SonarQube
+  - id: 'Unshallow clone'
+    name: gcr.io/cloud-builders/git
+    args: ['fetch', '--unshallow']
+
+  # 1) Instalar deps con Node 22 (no usar cloud-builders/npm)
+  - id: 'Install deps (Node 22)'
+    name: 'node:22-bullseye'
+    entrypoint: 'bash'
+    args:
+      - -lc
+      - |
+        node -v && npm -v
+        npm ci
+
+  # 2) Correr tests y generar coverage en /workspace/coverage/lcov.info
+  - id: 'Run unit tests (coverage)'
+    name: 'node:22-bullseye'
+    entrypoint: 'bash'
+    env:
+      # Más estable en builders con pocos CPUs/memoria
+      - 'CI=true'
+      - 'NODE_OPTIONS=--max-old-space-size=2048'
+    args:
+      - -lc
+      - |
+        node -v && npm -v
+        npx jest --coverage
+
+  # 3) Sonar (instalar Node 22 en Alpine y pasarlo al analizador)
   - id: 'Sonar'
     name: 'sonarsource/sonar-scanner-cli:5.0'
-    entrypoint: 'sonar-scanner'
+    entrypoint: 'sh'
     args:
-      - '-Dsonar.host.url=${_SONAR_URL}'
-      - '-Dsonar.token=${_SONAR_TOKEN}'
-      - '-Dsonar.projectKey=${_COMPONENT_NAME}'
+      - -lc
+      - |
+        # Node LTS para el analizador JS/TS (evita "embedded node" en Alpine)
+        apk add --no-cache nodejs-current >/dev/null
+        node -v
+        sonar-scanner \
+          -Dsonar.host.url=${_SONAR_URL} \
+          -Dsonar.token=${_SONAR_TOKEN} \
+          -Dsonar.projectKey=${_COMPONENT_NAME} \
+          -Dproject.settings=sonar.properties \
+          -Dsonar.nodejs.executable=$(which node)
+        # Si prefieres, puedes forzar aquí la ruta del LCOV:
+        # -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
 
-  # Construcción de imagen Docker
   - id: 'Build docker image'
     name: 'gcr.io/cloud-builders/docker'
     args:
-      - 'build'
-      - '-t'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/${_COMPONENT_NAME}:$BUILD_ID'
-      - '.'
+      [
+        'build',
+        '-t',
+        '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/${_COMPONENT_NAME}:$BUILD_ID',
+        '.',
+      ]
 
-  # Push de imagen al Artifact Registry
   - id: 'Push docker image'
     name: 'gcr.io/cloud-builders/docker'
     args:
-      - 'push'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/${_COMPONENT_NAME}:$BUILD_ID'
+      [
+        'push',
+        '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_DOCKER_REPOSITORY}/${_COMPONENT_NAME}:$BUILD_ID',
+      ]
 
-  # Despliegue en Cloud Run
   - id: 'Deploy to Cloud Run'
     name: 'gcr.io/cloud-builders/gcloud'
     args:
@@ -1196,6 +1239,8 @@ steps:
       - '${_REGION}'
       - '--service-account'
       - '${_RUN_SERVICE_ACCOUNT_EMAIL}'
+      - '--set-env-vars'
+      - 'ENV=${_ENV},PROJECT_ID=$PROJECT_ID,LIST_CORS=${_LIST_CORS},TOKEN_EXPIRATION=${_TOKEN_EXPIRATION},SECRETKEY_AUTH=${_SECRETKEY_AUTH},EXTERNAL_API_SECURITY_TYPE=${_EXTERNAL_API_SECURITY_TYPE},EXTERNAL_API_TOKEN=${_EXTERNAL_API_TOKEN},EXTERNAL_API_BASE_URL=${_EXTERNAL_API_BASE_URL},GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GCP_FIRESTORE_DATABASE_ID=${_GCP_FIRESTORE_DATABASE_ID},NODE_ENV=${_ENV},LOG_LEVEL=${_LOG_LEVEL},DB_HOST=${_DB_HOST},DB_PORT=${_DB_PORT},DB_USER=${_DB_USER},DB_PASS=${_DB_PASS},DB_DB=${_DB_DB},GCP_PROJECT_ID=$PROJECT_ID,CLOUD_RUN_TARGET_URL=${_CLOUD_RUN_TARGET_URL},CLOUD_RUN_API_BASE_URL=${_CLOUD_RUN_API_BASE_URL}'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
@@ -1207,6 +1252,9 @@ steps:
       - '1'
       - '--memory'
       - '512Mi'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
 ```
 
 #### **Variables de Entorno en Cloud Run**
@@ -1252,7 +1300,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 ---
 
-## 🖥️ **Custom Logger**
+## Custom logger
 
 Sistema de logging personalizado que proporciona logs estructurados y monitoreables para entornos de producción.
 
@@ -1379,7 +1427,7 @@ gcloud logs read "resource.type=cloud_run_revision AND jsonPayload.context=UserS
 
 ---
 
-## 🛡️ **Validaciones de Seguridad**
+## Validaciones de seguridad
 
 Sistema de seguridad multi-capa que protege contra ataques comunes y vulnerabilidades.
 
@@ -1623,7 +1671,7 @@ async function bootstrap() {
 
 ---
 
-## 🚀 **Distribución y Despliegue**
+## Distribucion y despliegue
 
 Estrategia completa de distribución para diferentes entornos y plataformas.
 
@@ -1826,7 +1874,7 @@ mysqldump -u user -p database > backup-$(date +%Y%m%d).sql
 
 ---
 
-## 🤝 **Contribuciones**
+## Contribuciones
 
 ### **Guía de Contribución**
 
@@ -1861,7 +1909,7 @@ refactor(core): optimize database connection
 
 ---
 
-## 📚 **Recursos Adicionales**
+## Recursos adicionales
 
 ### **Documentación Técnica**
 
@@ -1892,4 +1940,4 @@ refactor(core): optimize database connection
 
 ---
 
-**¡Feliz desarrollo con ZNT Template Project! 🚀**
+## ¡Feliz desarrollo con ZNT Template Project! 🚀
