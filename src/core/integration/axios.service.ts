@@ -156,9 +156,9 @@ export class AxiosService<T> implements IIntegrationService<T> {
 
   private handleAxiosError(error: any, endpoint: string): never {
     this.logger.error(
-      `Error en solicitud HTTP (${endpoint}): ${error.message}`,
-      error.stack,
+      `Error en solicitud HTTP (${this.baseUrl}/${endpoint}): ${error.message}`
     );
+    this.logger.error('Stack trace:', error.stack);
 
     if (error.response) {
       const { status, data } = error.response;
