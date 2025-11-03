@@ -24,7 +24,7 @@ import { UserFirestoreMapper } from './mappers/user.mapper';
 
     FirestoreRepositoryFactory(
       'USER_REPOSITORY',
-      'usuarios',
+      'users',
       UserFirestoreMapper,
       'FIRESTORE_AUTH',
     ),

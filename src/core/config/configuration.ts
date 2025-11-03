@@ -14,6 +14,8 @@ export const configuration = () => ({
   externalApiSecurityType: process.env.EXTERNAL_API_SECURITY_TYPE,
   externalApiKey: process.env.EXTERNAL_API_KEY,
   externalApiToken: process.env.EXTERNAL_API_TOKEN,
+
+  // Cloud Run
   cloudRunApiBaseUrl: process.env.CLOUD_RUN_API_BASE_URL,
   cloudRunTargetUrl: process.env.CLOUD_RUN_TARGET_URL,
   cloudRunIdToken: process.env.CLOUD_RUN_ID_TOKEN,
