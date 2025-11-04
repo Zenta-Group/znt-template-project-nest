@@ -119,27 +119,27 @@ export class AxiosService<T> implements IIntegrationService<T> {
     }
   }
 
-  async get(endpoint: string, params?: Record<string, any>): Promise<T> {
+  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
     try {
-      const response = await this.axiosInstance.get(endpoint, { params });
+      const response = await this.axiosInstance.get<T>(endpoint, { params });
       return response.data;
     } catch (error) {
       this.handleAxiosError(error, endpoint);
     }
   }
 
-  async post(endpoint: string, data: any): Promise<T> {
+  async post<T>(endpoint: string, data: any): Promise<T> {
     try {
-      const response = await this.axiosInstance.post(endpoint, data);
+      const response = await this.axiosInstance.post<T>(endpoint, data);
       return response.data;
     } catch (error) {
       this.handleAxiosError(error, endpoint);
     }
   }
 
-  async put(endpoint: string, data: any): Promise<T> {
+  async put<T>(endpoint: string, data: any): Promise<T> {
     try {
-      const response = await this.axiosInstance.put(endpoint, data);
+      const response = await this.axiosInstance.put<T>(endpoint, data);
       return response.data;
     } catch (error) {
       this.handleAxiosError(error, endpoint);
@@ -149,6 +149,54 @@ export class AxiosService<T> implements IIntegrationService<T> {
   async delete(endpoint: string): Promise<void> {
     try {
       await this.axiosInstance.delete(endpoint);
+    } catch (error) {
+      this.handleAxiosError(error, endpoint);
+    }
+  }
+
+  async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+    try {
+      const response = await this.axiosInstance.post<T>(endpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      this.handleAxiosError(error, endpoint);
+    }
+  }
+
+  async downloadFile(endpoint: string): Promise<{ buffer: Buffer; fileName: string }> {
+    try {
+      const response = await this.axiosInstance.get(endpoint, {
+        responseType: 'arraybuffer',
+      });
+
+      let fileName = 'archivo';
+      const contentDisposition = response.headers['content-disposition'];
+
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename\*?=['"]?([^'"\s]+)['"]?/i);
+        if (fileNameMatch) {
+          fileName = fileNameMatch[1];
+        }
+      }
+
+      if (fileName === 'archivo') {
+        const urlParts = endpoint.split('/');
+        const lastPart = urlParts[urlParts.length - 1];
+        if (lastPart && lastPart.includes('.')) {
+          fileName = lastPart;
+        } else {
+          fileName = 'documento.pdf';
+        }
+      }
+
+      return {
+        buffer: Buffer.from(response.data),
+        fileName: fileName
+      };
     } catch (error) {
       this.handleAxiosError(error, endpoint);
     }

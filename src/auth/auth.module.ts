@@ -8,7 +8,6 @@ import { AuthController } from './auth.controller';
 import { SharedModule } from 'src/shared/shared.module';
 import { CoreModule } from 'src/core/core.module';
 
-// Ejemplo de cómo inyectamos la secreta JWT desde variables de entorno
 @Module({
   imports: [
     ConfigModule,
