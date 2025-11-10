@@ -1,8 +1,4 @@
 steps:
-  - id: 'Unshallow clone'
-    name: gcr.io/cloud-builders/git
-    args: ['fetch', '--unshallow']
-
   # 1) Instalar deps con Node 22 (no usar cloud-builders/npm)
   - id: 'Install deps (Node 22)'
     name: 'node:22-bullseye'
