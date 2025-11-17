@@ -141,8 +141,8 @@ async function enableCors(app, configService: ConfigService) {
 
   if (cfg === '*') {
     app.enableCors(corsOptions);
-  } else if (cfg.includes(',')) {
-    const origins = cfg.split(',').map((url) => url.trim());
+  } else if (cfg.includes(';')) {
+    const origins = cfg.split(';').map((url) => url.trim());
     app.enableCors({ ...corsOptions, origin: origins });
   } else {
     app.enableCors({ ...corsOptions, origin: cfg });
