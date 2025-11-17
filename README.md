@@ -69,7 +69,7 @@ Crea un archivo `.env` en la raíz del proyecto y configura las siguientes varia
 ```env
 # Configuración de la aplicación
 APP_PORT=3000
-LIST_CORS=http://localhost:4200,http://localhost:3000
+LIST_CORS=http://localhost:4200;http://localhost:3000
 SECRETKEY_AUTH=tu-clave-secreta-muy-segura
 TOKEN_EXPIRATION=3600
 LOG_LEVEL=debug
@@ -102,7 +102,7 @@ CLOUD_RUN_API_BASE_URL=https://tu-servicio.run.app/api/v1
 
 ```env
 APP_PORT=3000
-LIST_CORS=http://localhost:4200,http://localhost:3000
+LIST_CORS=http://localhost:4200;http://localhost:3000
 TOKEN_EXPIRATION=3600
 SECRETKEY_AUTH=mi-clave-super-secreta-2025
 EXTERNAL_API_SECURITY_TYPE=none
