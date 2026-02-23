@@ -179,3 +179,7 @@ All endpoints must be documented using `@nestjs/swagger` decorators.
 - **ESLint**: Enforced code style
 - **Prettier**: Consistent formatting
 - **SonarQube**: Static analysis with quality gates
+
+---
+
+*Generated for KAN-11*
