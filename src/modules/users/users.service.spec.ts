@@ -24,7 +24,9 @@ describe('UsersService', () => {
       post: jest.fn(),
       put: jest.fn(),
       delete: jest.fn(),
-    };
+      postFormData: jest.fn(),
+      downloadFile: jest.fn(),
+    } as jest.Mocked<IIntegrationService<any>>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
