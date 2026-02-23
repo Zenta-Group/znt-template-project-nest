@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,9 +59,9 @@ jobs:
           path: coverage/lcov.info
           if-no-files-found: error
 
-  sonar:
-    needs: test
-    uses: Zenta-Group/znt-template-github-pipeline/.github/workflows/job_sonarqube-scan.yml@1.7.1-alpha
+  Sonar:
+    needs: Build
+    uses: Zenta-Group/znt-template-github-pipeline/.github/workflows/job_sonarqube-scan.yaml@1.7.5-alpha
     with:
       environment: "ci"
       use_env: true
