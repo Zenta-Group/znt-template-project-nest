@@ -69,5 +69,10 @@ jobs:
       use_env: true
       artifact_name: sonar-inputs
       quality_gate: true
+      sonar_args: >-
+        -Dsonar.sources=src
+        -Dsonar.tests=src
+        -Dsonar.test.inclusions=**/*.spec.ts
+        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
