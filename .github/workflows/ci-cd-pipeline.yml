@@ -1,25 +1,71 @@
-name: Simple CI/CD
+name: CI - NestJS + Sonar
 
 on:
   push:
-    branches:
-      - main
-      - feature/*
-  workflow_call:
-    inputs:
-      os_version:
-        description: "Pipeline operating system"
-        default: "ubuntu-latest"
-        required: false
-        type: string
-    secrets:
-      DOCKERHUB_USERNAME:
-        required: true
+    branches: [ "main" ]
+  pull_request:
 
 jobs:
-  hello-world:
-    #runs-on: ubuntu-latest
-    runs-on: ${{ inputs.os_version }}
+  test:
+    runs-on: ubuntu-latest
     steps:
-      - name: Saludar
-        run: echo "Hola Mundo"
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install deps (npm/yarn)
+        shell: bash
+        run: |
+          if [ -f yarn.lock ]; then
+            corepack enable
+            yarn install --immutable || yarn install --frozen-lockfile
+          else
+            npm ci
+          fi
+
+      - name: Tests + coverage (lcov)
+        shell: bash
+        run: |
+          if [ -f yarn.lock ]; then
+            yarn test:cov || yarn test --coverage
+          else
+            npm run test:cov --if-present || npm test -- --coverage
+          fi
+
+      - name: Normalize lcov path
+        shell: bash
+        run: |
+          set -euo pipefail
+          LCOV="$(find coverage -type f -name lcov.info | head -n 1 || true)"
+          if [ -z "$LCOV" ]; then
+            echo "coverage/lcov.info was not generated"
+            exit 1
+          fi
+          TARGET="coverage/lcov.info"
+          mkdir -p coverage
+          if [ "$LCOV" != "$TARGET" ]; then
+            cp "$LCOV" "$TARGET"
+          else
+            echo "lcov already normalized at ${TARGET}"
+          fi
+
+      - name: Upload Sonar inputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar-inputs
+          path: coverage/lcov.info
+          if-no-files-found: error
+
+  sonar:
+    needs: test
+    uses: Zenta-Group/znt-template-github-pipeline/.github/workflows/job_sonarqube-scan.yml@1.7.1-alpha
+    with:
+      environment: "ci"
+      use_env: true
+      artifact_name: sonar-inputs
+      quality_gate: true
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
