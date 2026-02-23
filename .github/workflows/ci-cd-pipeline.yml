@@ -61,7 +61,7 @@ jobs:
 
   Sonar:
     needs: Build
-    uses: Zenta-Group/znt-template-github-pipeline/.github/workflows/job_sonarqube-scan.yaml@1.7.5-alpha
+    uses: Zenta-Group/znt-template-github-pipeline/.github/workflows/job_sonarqube-scan.yaml@v1.7.5-alpha
     with:
       environment: "ci"
       use_env: true
